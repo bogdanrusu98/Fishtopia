@@ -2,3 +2,15 @@
 @tailwind components;
 @tailwind utilities;
 
+
+@media (min-width: 1024px) { 
+    .swiper {
+        width: 30vw;
+    }
+     }
+
+     @media (min-width: 1920px) { 
+        .swiper {
+            width: 70vw;
+        }
+         }

@@ -1,13 +1,15 @@
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { useState, useEffect } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { Navigation, Pagination, Scrollbar, A11y, Zoom } from 'swiper/modules';
+import { Navigation, Pagination, Scrollbar, A11y} from 'swiper/modules';
 import SwiperCore from 'swiper';
 import 'swiper/css';
 import 'swiper/css/virtual';
 import { db } from '../firebase.config';
 import { getDoc, doc } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
+import 'swiper/css/pagination';
+import 'swiper/css/navigation';
 import {
   TransformWrapper,
   TransformComponent,
@@ -18,6 +20,7 @@ SwiperCore.use([Navigation, Pagination, Scrollbar, A11y]);
 
 function Listing() {
   const [listing, setListing] = useState(null);
+  const [userName, setUserName] = useState(null)
 
   const navigate = useNavigate();
   const auth = getAuth();
@@ -33,13 +36,27 @@ function Listing() {
       }
     };
 
+    const fetchUserName = async () => {
+      if (auth.currentUser) {
+        const userRef = doc(db, 'users', auth.currentUser.uid);
+        const userSnap = await getDoc(userRef);
+
+        if (userSnap.exists()) {
+          setUserName(userSnap.data().name);
+        }
+      }
+    };
+
+    fetchUserName()
     fetchListing();
-  }, [navigate, params.listingId]);
+  }, [navigate, params.listingId, auth.currentUser]);
 
   const Controls = () => {
     const { zoomIn, zoomOut, resetTransform } = useControls();
 
   };
+
+  
   
 
   return (
@@ -48,9 +65,10 @@ function Listing() {
         <>
           <Swiper
   slidesPerView={'auto'}
-  pagination={{ clickable: true }}
-  navigation
-  scrollbar={{ draggable: true }}
+  pagination={{
+    type: 'fraction',
+  }}
+  navigation={true}
 >
   {listing.imgUrls.map((url, index) => (
 
@@ -65,8 +83,8 @@ function Listing() {
           <Controls />
           <TransformComponent>
 
-        <div className='flex justify-center items-center'>
-      <img src={url} className='object-cover h-96 w-full' alt={`Slide ${index}`} />
+        <div className='flex justify-center items-center object-cover w-96 w-full'>
+      <img src={url} className='' alt={`Slide ${index}`} />
 
       </div>
       </TransformComponent>
@@ -81,8 +99,8 @@ function Listing() {
 
           <div className="listingDetails"> <br />
             
-<h2 class="mb-2 text-lg font-semibold text-gray-900 ">{listing.name}</h2>
-<ul class="max-w-md space-y-1 text-gray-500 list-none list-inside dark:text-gray-400">
+<h2 class="mb-2 text-4xl font-semibold text-gray-900 ">{listing.name}</h2>
+<ul class="max-w-md space-y-1 text-lg text-gray-500 list-none list-inside dark:text-gray-400">
     <li>
         Risc de disparitie: {listing.risk}
     </li>
@@ -90,12 +108,16 @@ function Listing() {
         Tara: {listing.country}
     </li>
     <li>
-        Intaltime si greutate: {listing.length}, {listing.weight}
+        Inaltime si greutate: {listing.length}, {listing.weight}
     </li>
     <li>
-      Created by: {listing.userRef}
+      Created by:  
+       <span className="text-black"> {userName}</span>
+
     </li>
 </ul>
+
+
 
 
             {auth.currentUser?.uid !== listing.userRef && (
@@ -103,7 +125,6 @@ function Listing() {
                 to={`/contact/${listing.userRef}?listingName=${listing.name}`}
                 className="primaryButton"
               >
-                Contact Landlord
               </Link>
             )}
           </div>
