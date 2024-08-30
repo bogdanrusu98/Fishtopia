@@ -19,7 +19,7 @@ function Home() {
 
         // Create a query
 
-        const q = query(listingsRef, limit(5), orderBy('timestamp', 'desc'))
+        const q = query(listingsRef, limit(15), orderBy('timestamp', 'desc'))
 
         const querySnap = await getDocs(q)
 
@@ -46,11 +46,11 @@ function Home() {
   return (
   <>
     <div>
-      <h1 className="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight">Welcome</h1>
+      <h1 className="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-3xl text-center sm:tracking-tight">Welcome</h1>
       <br />
 
 
-      <div className="flex flex-wrap  gap-4">
+      <div className="flex flex-wrap justify-center gap-4">
       {loading ? (
         <p>Loading...</p>
       ) : (

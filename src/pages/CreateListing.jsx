@@ -146,7 +146,6 @@ function CreateListing() {
     toast.success('Listing saved')
     console.log(formDataCopy.type, docRef.id);
     navigate(`/`);
-
   };
 
   const onMutate = (e) => {
@@ -188,76 +187,90 @@ function CreateListing() {
       </header>
 
       <main>
-        <form className='max-w-sm' onSubmit={onSubmit}>
-          
-        <div className="mt-5">
-            <label for="text" className="block mb-2 text-sm font-medium">Name Fish</label>
-            <input
-             type="text" 
-             id="name"
-             value={name}
-            onChange={onMutate} 
-             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" 
-             required />
-        </div>
-        <div className="">
-            <label for="text" className="block mb-2 text-sm font-medium">Country</label>
-            <input 
-            type="text" 
-            id="country" 
-            value={country}
-            onChange={onMutate}
-            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" 
-            required />
-        </div>
-        <div className="">
-            <label for="text" className="block mb-2 text-sm font-medium">Risk</label>
-            <input 
-            type="text" 
-            id="risk" 
-            value={risk}
-            onChange={onMutate}
-            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" 
-            required />
-        </div>
-        <div className="">
-            <label for="text" className="block mb-2 text-sm font-medium">Length</label>
-            <input 
-            type="text" 
-            id="length" 
-            value={length}
-            onChange={onMutate}
-            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" 
-            required />
-        </div>
-        <div className="">
-            <label for="text" className="block mb-2 text-sm font-medium">Weight</label>
-            <input 
-            type="text" 
-            id="weight" 
-            value={weight}
-            onChange={onMutate}
-            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" 
-            required />
-        </div>
-        <div className="">
-        <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white" for="user_avatar">Upload file</label>
-            <input
-        className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
-        type='file'
-        id='images'
-        onChange={onMutate}
-        max='1'
-        accept=".jpg, .png, .jpeg"
-        required
-        />     
-          <div className="mt-1 text-sm text-black-500 dark:text-black-300" id="user_avatar_help">Just one picture</div>
+      <form className="max-w-lg mx-auto bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg" onSubmit={onSubmit}>
+  <h2 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white text-center">Create a Fish Listing</h2>
 
-           </div>
+  <div className="mb-4">
+    <label htmlFor="name" className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-200">Fish Name</label>
+    <input
+      type="text"
+      id="name"
+      value={name}
+      onChange={onMutate}
+      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-purple-500 focus:border-purple-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+      required
+    />
+  </div>
 
-<button type='submit' className="focus:outline-none text-white bg-purple-700 hover:bg-purple-800 focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm px-5 py-2.5 mb-2 dark:bg-purple-600 dark:hover:bg-purple-700 dark:focus:ring-purple-900">Create Listing</button>
+  <div className="mb-4">
+    <label htmlFor="country" className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-200">Country</label>
+    <input
+      type="text"
+      id="country"
+      value={country}
+      onChange={onMutate}
+      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-purple-500 focus:border-purple-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+      required
+    />
+  </div>
 
-        </form>
+  <div className="mb-4">
+    <label htmlFor="risk" className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-200">Risk Level</label>
+    <input
+      type="text"
+      id="risk"
+      value={risk}
+      onChange={onMutate}
+      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-purple-500 focus:border-purple-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+      required
+    />
+  </div>
+
+  <div className="mb-4">
+    <label htmlFor="length" className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-200">Length (cm)</label>
+    <input
+      type="text"
+      id="length"
+      value={length}
+      onChange={onMutate}
+      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-purple-500 focus:border-purple-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+      required
+    />
+  </div>
+
+  <div className="mb-4">
+    <label htmlFor="weight" className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-200">Weight (kg)</label>
+    <input
+      type="text"
+      id="weight"
+      value={weight}
+      onChange={onMutate}
+      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-purple-500 focus:border-purple-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+      required
+    />
+  </div>
+
+  <div className="mb-6">
+    <label htmlFor="images" className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-200">Upload Image</label>
+    <input
+      type="file"
+      id="images"
+      onChange={onMutate}
+      accept=".jpg, .png, .jpeg"
+      className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
+      required
+    />
+    <p className="mt-1 text-sm text-gray-500 dark:text-gray-300">Just one picture allowed</p>
+  </div>
+
+  <button
+    type="submit"
+    className="w-full text-white bg-purple-700 hover:bg-purple-800 focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-purple-600 dark:hover:bg-purple-700 dark:focus:ring-purple-900 transition ease-in-out duration-150"
+  >
+    Create Listing
+  </button>
+</form>
+
       </main>
     </div>
     

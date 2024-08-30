@@ -41,13 +41,9 @@ function Navbar({title}) {
 
             <div className='flex-1 px-2 mx-2'>
                 <div className="flex justify-end">
-                    <Link to='/' className='btn btn-ghost btn-sm rounded-btn'>Home</Link>
-                    <Link to='/about' className='btn btn-ghost btn-sm rounded-btn'>About</Link>
-
                     {loggedIn ? (
         <>
           <Link to='/create-listing' className='btn btn-primary btn-sm rounded-btn'>Create Listing</Link>
-          
           <button onClick={handleLogout} className='btn btn-secondary btn-sm rounded-btn'>Logout</button>
         </>
       ) : (
