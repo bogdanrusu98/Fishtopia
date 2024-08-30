@@ -1,0 +1,34 @@
+{
+  "fishDatabase": [
+  {
+    "id": 1,
+    "name": "Atlantic Salmon",
+    "country": "Norway",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/56/Salmo_salar.jpg/1920px-Salmo_salar.jpg"
+  },
+  {
+    "id": 2,
+    "name": "Clownfish",
+    "country": "Australia",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7c/Amphiprion_ocellaris_%28Clown_fish%29.jpg/1920px-Amphiprion_ocellaris_%28Clown_fish%29.jpg"
+  },
+  {
+    "id": 3,
+    "name": "Rainbow Trout",
+    "country": "United States",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/Rainbow_trout_fish_oncorhynchus_mykiss_detailed_photo.jpg/1920px-Rainbow_trout_fish_oncorhynchus_mykiss_detailed_photo.jpg"
+  },
+  {
+    "id": 4,
+    "name": "Blue Tang",
+    "country": "Indonesia",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/81/Paracanthurus_hepatus.JPG/1920px-Paracanthurus_hepatus.JPG"
+  },
+  {
+    "id": 5,
+    "name": "Great White Shark",
+    "country": "South Africa",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/56/White_shark.jpg/1920px-White_shark.jpg"
+  }
+]
+}

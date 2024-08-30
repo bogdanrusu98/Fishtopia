@@ -1,24 +1,39 @@
-import logo from './logo.svg';
-import './App.css';
+import {BrowserRouter as Router, Route, Routes} from 'react-router-dom'
+import Navbar from './components/layout/Navbar';
+import PropTypes from 'prop-types'
+import Home from './pages/Home';
+import About from './pages/About';
+import Fish from './pages/Fish';
+import Footer from './components/layout/Footer';
+import NotFound from './pages/NotFound';
+import FishResults from './components/fishes/FishResults';
+import SignIn from './pages/SignIn';
+import SignUp from './pages/SignUp';
+import CreateListing from './pages/CreateListing';
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router>
+      <Navbar />
+      
+      <main className='container mx-auto px-3 pb-12'>
+        <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/fish/:login" element={<Fish />} />
+            <Route path="/notfound" element={<NotFound />} />
+            <Route path="/*" element={<NotFound />} />
+            <Route path='/login' element={<SignIn />} />
+            <Route path='/register' element={<SignUp />} />
+            <Route path='/create-listing' element={<CreateListing />} />
+        </Routes>
+      </main>
+      
+      <Footer />
+    </Router>
+
+
+    
   );
 }
 
