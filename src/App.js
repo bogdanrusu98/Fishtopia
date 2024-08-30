@@ -1,4 +1,7 @@
 import {BrowserRouter as Router, Route, Routes} from 'react-router-dom'
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 import Navbar from './components/layout/Navbar';
 import PropTypes from 'prop-types'
 import Home from './pages/Home';
@@ -8,11 +11,13 @@ import Footer from './components/layout/Footer';
 import NotFound from './pages/NotFound';
 import FishResults from './components/fishes/FishResults';
 import SignIn from './pages/SignIn';
+
 import SignUp from './pages/SignUp';
 import CreateListing from './pages/CreateListing';
 
 function App() {
   return (
+    <>
     <Router>
       <Navbar />
       
@@ -31,9 +36,9 @@ function App() {
       
       <Footer />
     </Router>
+    <ToastContainer />
 
-
-    
+    </>
   );
 }
 

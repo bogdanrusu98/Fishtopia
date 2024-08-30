@@ -37,11 +37,12 @@ function SignIn() {
 
       if(userCredential.user) {
         navigate('/')
+        toast.success('You have been logged in!')
       } else{
         toast.error('error')
       }
     } catch(error) {
-      toast.error('Password wrong')
+      toast.error('Email or Password wrong')
     }
 
 
