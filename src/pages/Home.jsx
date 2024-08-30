@@ -46,7 +46,7 @@ function Home() {
   return (
   <>
     <div>
-      <h1 className="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-3xl text-center sm:tracking-tight">Welcome</h1>
+      <h1 className="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-3xl text-center sm:tracking-tight">Welcome </h1>
       <br />
 
 

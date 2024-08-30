@@ -61,9 +61,9 @@ function CreateListing() {
     e.preventDefault();
 
 
-    if(images.length > 1) {
+    if(images.length > 6) {
       setLoading(false)
-      toast.error('Max 1 image')
+      toast.error('Max 6 images')
       return
     }
 
@@ -256,11 +256,13 @@ function CreateListing() {
       type="file"
       id="images"
       onChange={onMutate}
+      max='6'
       accept=".jpg, .png, .jpeg"
+      multiple
       className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
       required
     />
-    <p className="mt-1 text-sm text-gray-500 dark:text-gray-300">Just one picture allowed</p>
+    <p className="mt-1 text-sm text-gray-500 dark:text-gray-300">The first image will be the cover (max 6).</p>
   </div>
 
   <button

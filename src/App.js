@@ -11,7 +11,7 @@ import Footer from './components/layout/Footer';
 import NotFound from './pages/NotFound';
 import FishResults from './components/fishes/FishResults';
 import SignIn from './pages/SignIn';
-
+import Listing from './pages/Listing';
 import SignUp from './pages/SignUp';
 import CreateListing from './pages/CreateListing';
 
@@ -31,6 +31,7 @@ function App() {
             <Route path='/login' element={<SignIn />} />
             <Route path='/register' element={<SignUp />} />
             <Route path='/create-listing' element={<CreateListing />} />
+            <Route path='/listing/:listingId' element={<Listing />} />
         </Routes>
       </main>
       
