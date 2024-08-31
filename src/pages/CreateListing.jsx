@@ -13,6 +13,7 @@ import {v4 as uuidv4} from 'uuid'
 import {addDoc, collection, serverTimestamp} from 'firebase/firestore'
 
 
+
 function CreateListing() {
   // eslint-disable-next-line
   const [geolocationEnabled, setGeolocationEnabled] = useState(true);
@@ -22,6 +23,7 @@ function CreateListing() {
     images: {},
     length: '',
     risk: '',
+    description: '',
     weight: '',
   });
 
@@ -32,6 +34,7 @@ function CreateListing() {
     length,
     risk,
     weight,
+    description,
   } = formData;
 
   const [loading, setLoading] = useState(false);
@@ -180,6 +183,8 @@ function CreateListing() {
     return 'Loading...';
   }
 
+  
+
   return (
     <div className="profile">
       <header>
@@ -249,6 +254,18 @@ function CreateListing() {
       required
     />
   </div>
+
+    <div className="mb-4">
+  <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-200">Description</label>
+        <textarea
+          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-purple-500 focus:border-purple-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+          type="text"
+          id="description"
+          value={description}
+          onChange={onMutate}
+          required
+        ></textarea>
+        </div>
 
   <div className="mb-6">
     <label htmlFor="images" className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-200">Upload Image</label>
