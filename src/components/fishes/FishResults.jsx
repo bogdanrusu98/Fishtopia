@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react"
 import { Link } from "react-router-dom"
+import {ReactComponent as DeleteIcon} from '../../assets/svg/deleteIcon.svg'
 
 
-function FishResults( {listing, id}) {
+function FishResults( {listing, id, onDelete}) {
     const [fishes, setFishes] = useState([])
 
 
@@ -37,6 +38,11 @@ function FishResults( {listing, id}) {
       <Link to={`/listing/${id}`} className="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
         Read more
       </Link>
+
+      {onDelete && (
+            <DeleteIcon className="removeIcon inline float-right" fill="rgb(231, 76, 60)" onClick={() => onDelete(listing.id, listing.name)} />
+        )}
+
     </div>
   </div>
  

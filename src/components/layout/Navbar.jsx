@@ -23,12 +23,6 @@ function Navbar({title}) {
     return () => unsubscribe();
   }, []);
 
-  const handleLogout = async () => {
-    const auth = getAuth();
-    await signOut(auth);
-    toast.success('Logged out')
-  };
-
   return (
     <nav className='navbar mb-12 shadow-lg bg-neutral text-neutral-content'>
         <div className='container mx-auto'>
@@ -44,11 +38,13 @@ function Navbar({title}) {
                     {loggedIn ? (
         <>
           <Link to='/create-listing' className='btn btn-primary btn-sm rounded-btn'>Create Listing</Link>
-          <button onClick={handleLogout} className='btn btn-secondary btn-sm rounded-btn'>Logout</button>
+          &nbsp;
+          <Link to='/profile' className='btn btn-primary btn-sm rounded-btn'>My Profile</Link>
         </>
       ) : (
         <>
           <Link to='/login' className='btn btn-secondary btn-sm rounded-btn'>Login</Link>
+          &nbsp;
           <Link to='/register' className='btn btn-primary btn-sm rounded-btn'>Sign Up</Link>
         </>
       )}
@@ -62,6 +58,7 @@ function Navbar({title}) {
 
 Navbar.defaultProps = {
   title: 'FishTopia',
+  
 }
 
 Navbar.propTypes = {

@@ -15,6 +15,7 @@ import SignUp from './pages/SignUp';
 import CreateListing from './pages/CreateListing';
 import Profile from './pages/Profile';
 import PrivateRoute from './components/PrivateRoute';
+import ForgotPassword from './pages/ForgotPassword';
 
 function App() {
   return (
@@ -30,10 +31,14 @@ function App() {
             <Route path="/notfound" element={<NotFound />} />
             <Route path="/*" element={<NotFound />} />
             <Route path='/login' element={<SignIn />} />
+          <Route path='/forgot-password' element={<ForgotPassword />} />
             <Route path='/register' element={<SignUp />} />
             <Route path='/create-listing' element={<CreateListing />} />
             <Route path='/listing/:listingId' element={<Listing />} />
-            <Route path='/profile' element={<Profile />} />
+            <Route path='/profile' element={<PrivateRoute />}>
+          <Route path='/profile' element={<Profile />} />
+
+        </Route>
         </Routes>
       </main>
       
