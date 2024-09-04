@@ -3,6 +3,7 @@ import {db} from '../firebase.config'
 import { useState } from "react";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import {toast} from 'react-toastify'
+import OAuth from "../components/OAuth";
 
 
 function SignIn() {
@@ -112,7 +113,9 @@ function SignIn() {
                 Sign in
               </button>
             </div>
-          </form>
+          </form>          
+          <OAuth />
+
         </div>
       </div>
     </>
