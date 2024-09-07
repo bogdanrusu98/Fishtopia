@@ -31,6 +31,7 @@ function OAuth() {
 
         }
         navigate('/')
+        toast.success('Welcome back')
     }   catch (error) {
         toast.error('Could not authorized with Google')
     }
