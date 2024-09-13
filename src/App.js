@@ -12,6 +12,7 @@ import FishResults from './components/fishes/FishResults';
 import SignIn from './pages/SignIn';
 import Listing from './pages/Listing';
 import SignUp from './pages/SignUp';
+import EditListing from './pages/EditListing';
 import CreateListing from './pages/CreateListing';
 import Profile from './pages/Profile';
 import PrivateRoute from './components/PrivateRoute';
@@ -34,6 +35,7 @@ function App() {
           <Route path='/forgot-password' element={<ForgotPassword />} />
             <Route path='/register' element={<SignUp />} />
             <Route path='/create-listing' element={<CreateListing />} />
+            <Route path='/edit-listing/:listingId' element={<EditListing />} />
             <Route path='/listing/:listingId' element={<Listing />} />
             <Route path='/profile' element={<PrivateRoute />}>
           <Route path='/profile' element={<Profile />} />
