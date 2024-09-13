@@ -1,7 +1,7 @@
 import { Swiper, SwiperSlide } from "swiper/react";
 import { useState, useEffect } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { Navigation, Pagination, Scrollbar, A11y } from "swiper/modules";
+import { Navigation, Pagination, Scrollbar, A11y, Zoom } from "swiper/modules";
 import SwiperCore from "swiper";
 import "swiper/css";
 import "swiper/css/virtual";
@@ -11,14 +11,10 @@ import { getAuth } from "firebase/auth";
 import "swiper/css/pagination";
 import "swiper/css/navigation";
 import { RiErrorWarningFill } from "react-icons/ri";
+import { collection, query, where, getDocs } from "firebase/firestore";
 
-import {
-  TransformWrapper,
-  TransformComponent,
-  useControls,
-} from "react-zoom-pan-pinch";
 
-SwiperCore.use([Navigation, Pagination, Scrollbar, A11y]);
+SwiperCore.use([Navigation, Pagination, Zoom]);
 
 function Listing() {
   const [listing, setListing] = useState(null);
@@ -32,67 +28,78 @@ function Listing() {
     const fetchListing = async () => {
       const docRef = doc(db, "listings", params.listingId);
       const docSnap = await getDoc(docRef);
-
+  
       if (docSnap.exists()) {
-        setListing(docSnap.data());
+        setListing(docSnap.data()); // Setăm listing după ce îl obținem din Firestore
+      } else {
+        console.log("Listing not found");
       }
     };
-
+  
+    fetchListing(); // Obține listing-ul
+  }, [params.listingId]); // Se declanșează când listingId se schimbă
+  
+  useEffect(() => {
     const fetchUserName = async () => {
-      if (auth.currentUser) {
-        const userRef = doc(db, "users", auth.currentUser.uid);
-        const userSnap = await getDoc(userRef);
-
-        if (userSnap.exists()) {
-          setUserName(userSnap.data().name);
+      if (!listing || !listing.userRef) {
+        console.log("Listing or userRef is null/undefined");
+        return; // Oprește execuția dacă listing sau userRef nu sunt definite
+      }
+  
+      // Creăm referința directă la documentul utilizatorului
+      const userDocRef = doc(db, "users", listing.userRef);
+  
+      try {
+        const userDocSnap = await getDoc(userDocRef); // Obținem documentul specific
+  
+        if (userDocSnap.exists()) {
+          setUserName(userDocSnap.data().name); // Setăm numele dacă documentul există
+        } else {
+          console.log("No matching user found");
         }
+      } catch (error) {
+        console.error("Error fetching user: ", error);
       }
     };
-
-    fetchUserName();
-    fetchListing();
-  }, [navigate, params.listingId, auth.currentUser]);
-
-  const Controls = () => {
-    const { zoomIn, zoomOut, resetTransform } = useControls();
-  };
-
+  
+    if (listing) {
+      fetchUserName(); // Apelăm fetchUserName doar când listing a fost setat
+    }
+  }, [listing]); // Efectul se declanșează când `listing` se schimbă
+  
   return (
     <main>
       {listing ? (
         <>
-          <Swiper
+                    <Swiper
             slidesPerView={"auto"}
-            pagination={{
-              type: "fraction",
-            }}
+            pagination={{ type: "progressbar" }}
+            touch={false}
+            simulateTouch={false}
             navigation={true}
+            zoom
+            zoomMaxRatio={3}
+            zoomMinRatio={1}
+            className="w-auto"
           >
             {listing.imgUrls.map((url, index) => (
-              <SwiperSlide key={index}>
-                <TransformWrapper>
-                  {({ zoomIn, zoomOut, resetTransform, ...rest }) => (
-                    <>
-                      <Controls />
-                      <TransformComponent>
-                        <div className="flex justify-center items-center object-cover w-96 w-full ">
-                          <img src={url} className="" alt={`Slide ${index}`} />
-                        </div>
-                      </TransformComponent>
-                    </>
-                  )}
-                </TransformWrapper>
+
+              <SwiperSlide key={index} className="">
+                <div className="swiper-zoom-container flex justify-center items-center">
+                  <img src={url} className="object-contain h-48 w-96 swiper-zoom-target" alt={`Slide ${index}`} />
+                </div>
               </SwiperSlide>
             ))}
+
           </Swiper>
 
           <div className="listingDetails bg-gray-100	p-4 mt-4">
             {" "}
             <br />
-            <h2 class="mb-2 text-4xl font-semibold text-gray-900 ">
+            <h2 className="mb-2 text-4xl font-semibold text-gray-900 ">
               {listing.name}
             </h2>
-            <ul class="max-w-md space-y-1 text-lg text-zinc-500 list-none list-inside dark:text-zinc-400">
+            <ul className="max-w-md space-y-1 text-lg text-zinc-500 list-none list-inside dark:text-zinc-400">
               <li>Risc de disparitie: {listing.risk}</li>
               <li>Tara: {listing.country}</li>
               <li>

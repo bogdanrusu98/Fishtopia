@@ -21,9 +21,9 @@ function FishResults( {listing, id, onDelete}) {
   return (
     
     
-  <div className="max-w-sm bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+  <div className="bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
     <Link to={`/listing/${id}`}>
-      <img className="rounded-t-lg" src={listing.imgUrls} alt="" />
+      <img className="rounded-t-lg object-contain h-48 w-96" src={listing.imgUrls} alt="" />
     </Link>
     <div className="p-5">
     <Link to={`/listing/${id}`}>
