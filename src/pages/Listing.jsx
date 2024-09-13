@@ -84,9 +84,9 @@ function Listing() {
           >
             {listing.imgUrls.map((url, index) => (
 
-              <SwiperSlide key={index} className="">
+              <SwiperSlide key={index} className="w-auto h-auto">
                 <div className="swiper-zoom-container flex justify-center items-center">
-                  <img src={url} className="object-contain h-48 w-96 swiper-zoom-target" alt={`Slide ${index}`} />
+                  <img src={url} className="object-contain h-49 w-96 swiper-zoom-target" alt={`Slide ${index}`} />
                 </div>
               </SwiperSlide>
             ))}
