@@ -18,8 +18,12 @@ import {
   doc,
   updateDoc,
 } from "firebase/firestore";
+import { Editor } from '@tinymce/tinymce-react';
+
 
 function EditListing() {
+  const editorRef = useRef(null);
+
   // eslint-disable-next-line
   const [formData, setFormData] = useState({
     name: "",
@@ -306,19 +310,35 @@ function EditListing() {
             />
           </div>
 
+  
           <div className="mb-4">
-            <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-200">
-              Description
-            </label>
-            <textarea
-              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-purple-500 focus:border-purple-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
-              type="text"
-              id="description"
-              value={description}
-              onChange={onMutate}
-              required
-            ></textarea>
-          </div>
+  <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-200">Description</label>
+  <Editor
+    apiKey="dphia909nnnrxny7iltrwnyxx7u62ht0wdo9hmviei90lkt7"
+    onInit={(_evt, editor) => editorRef.current = editor}
+    initialValue="<p>This is the initial content of the editor.</p>"
+    init={{
+      height: 500,
+      menubar: false,
+      plugins: [
+        'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
+        'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
+        'insertdatetime', 'media', 'table', 'code', 'help', 'wordcount'
+      ],
+      toolbar: 'undo redo | blocks | ' +
+        'bold italic forecolor | alignleft aligncenter ' +
+        'alignright alignjustify | bullist numlist outdent indent | ' +
+        'removeformat | help',
+      content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }',
+    }}
+    value={description}
+    onEditorChange={(content) => setFormData((prevState) => ({
+      ...prevState,
+      description: content
+    }))}
+  />
+        </div>
+
 
           <div className="mb-6">
             <label

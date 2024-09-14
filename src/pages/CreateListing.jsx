@@ -11,12 +11,14 @@ import {db} from '../firebase.config'
 import {toast} from 'react-toastify'
 import {v4 as uuidv4} from 'uuid'
 import {addDoc, collection, serverTimestamp} from 'firebase/firestore'
-
-
+import { Editor } from '@tinymce/tinymce-react';
 
 function CreateListing() {
+
   // eslint-disable-next-line
   const [geolocationEnabled, setGeolocationEnabled] = useState(true);
+  const editorRef = useRef(null);
+
   const [formData, setFormData] = useState({
     name: "",
     country: '',
@@ -142,7 +144,6 @@ function CreateListing() {
     }
 
     delete formDataCopy.images
-
     const docRef = await addDoc(collection(db, 'listings'), formDataCopy)
 
     setLoading(false)
@@ -182,7 +183,7 @@ function CreateListing() {
   if (loading) {
     return 'Loading...';
   }
-
+  
   
 
   return (
@@ -255,16 +256,32 @@ function CreateListing() {
     />
   </div>
 
-    <div className="mb-4">
+  <div className="mb-4">
   <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-200">Description</label>
-        <textarea
-          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-purple-500 focus:border-purple-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
-          type="text"
-          id="description"
-          value={description}
-          onChange={onMutate}
-          required
-        ></textarea>
+  <Editor
+    apiKey="dphia909nnnrxny7iltrwnyxx7u62ht0wdo9hmviei90lkt7"
+    onInit={(_evt, editor) => editorRef.current = editor}
+    initialValue="<p>This is the initial content of the editor.</p>"
+    init={{
+      height: 500,
+      menubar: false,
+      plugins: [
+        'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
+        'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
+        'insertdatetime', 'media', 'table', 'code', 'help', 'wordcount'
+      ],
+      toolbar: 'undo redo | blocks | ' +
+        'bold italic forecolor | alignleft aligncenter ' +
+        'alignright alignjustify | bullist numlist outdent indent | ' +
+        'removeformat | help',
+      content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }',
+    }}
+    value={description}
+    onEditorChange={(content) => setFormData((prevState) => ({
+      ...prevState,
+      description: content
+    }))}
+  />
         </div>
 
   <div className="mb-6">
@@ -288,11 +305,11 @@ function CreateListing() {
   >
     Create Listing
   </button>
+
 </form>
 
       </main>
     </div>
-    
   );
 }
 

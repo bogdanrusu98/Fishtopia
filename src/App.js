@@ -17,6 +17,8 @@ import CreateListing from './pages/CreateListing';
 import Profile from './pages/Profile';
 import PrivateRoute from './components/PrivateRoute';
 import ForgotPassword from './pages/ForgotPassword';
+import { Editor } from '@tinymce/tinymce-react';
+
 
 function App() {
   return (

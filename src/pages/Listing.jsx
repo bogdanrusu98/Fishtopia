@@ -11,7 +11,6 @@ import { getAuth } from "firebase/auth";
 import "swiper/css/pagination";
 import "swiper/css/navigation";
 import { RiErrorWarningFill } from "react-icons/ri";
-import { collection, query, where, getDocs } from "firebase/firestore";
 
 
 SwiperCore.use([Navigation, Pagination, Zoom]);
@@ -120,7 +119,7 @@ function Listing() {
 
           {listing.description ? (
             <div className="border border-black bg-gray-200 rounded mt-4 p-4">
-              {listing.description}
+              <p dangerouslySetInnerHTML={{__html: listing.description}}/>
             </div>
           ) : (
             <>
