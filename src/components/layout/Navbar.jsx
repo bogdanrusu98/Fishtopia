@@ -1,13 +1,16 @@
-import {Link} from 'react-router-dom'
+import {Link, useNavigate} from 'react-router-dom'
 import PropTypes from 'prop-types'
 import { IoFishSharp } from "react-icons/io5";
 import { getAuth, onAuthStateChanged, signOut } from 'firebase/auth';
 import { useState, useEffect } from 'react';
 import {toast} from 'react-toastify'
-
+import { Avatar, Dropdown } from "flowbite-react";
+import { useUser } from '../../hooks/userContext';
 
 function Navbar({title}) {
   const [loggedIn, setLoggedIn] = useState(false);
+  const user = useUser()
+  const navigate = useNavigate()
 
   useEffect(() => {
     const auth = getAuth();
@@ -22,6 +25,13 @@ function Navbar({title}) {
     // Cleanup subscription on unmount
     return () => unsubscribe();
   }, []);
+
+  const handleLogout = async () => {
+    const auth = getAuth();
+    await signOut(auth);
+    toast.success('Logged out')
+    navigate('/')
+  };
 
   return (
     <nav className='navbar mb-12 shadow-lg bg-neutral text-neutral-content'>
@@ -39,7 +49,30 @@ function Navbar({title}) {
         <>
           <Link to='/create-listing' className='btn btn-primary btn-sm rounded-btn'>Create Listing</Link>
           &nbsp;
-          <Link to='/profile' className='btn btn-primary btn-sm rounded-btn'>My Profile</Link>
+          {user ? (
+              <Dropdown
+                arrowIcon={false}
+                inline={true}
+                label={<Avatar alt="User settings" img={user.photoURL ? user.photoURL : "https://flowbite.com/docs/images/people/profile-picture-5.jpg"} rounded={true} />}
+              >
+                <Dropdown.Header>
+                  <span className="block text-sm">{user.displayName}</span>
+                  <span className="block truncate text-sm font-medium">{user.email}</span>
+                </Dropdown.Header>
+                <Dropdown.Item>
+                  <Link to='/profile'>
+                    Settings
+                  </Link>
+                </Dropdown.Item>
+                <Dropdown.Divider />
+                <Dropdown.Item onClick={handleLogout}>
+                  Sign out
+                </Dropdown.Item>
+              </Dropdown>
+            ) : (
+
+              'You are not logged in'
+            )}
         </>
       ) : (
         <>
@@ -52,6 +85,7 @@ function Navbar({title}) {
                 </div>
             </div>
         </div>
+        
     </nav>
   )
 }

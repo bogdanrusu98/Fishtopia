@@ -18,13 +18,14 @@ import Profile from './pages/Profile';
 import PrivateRoute from './components/PrivateRoute';
 import ForgotPassword from './pages/ForgotPassword';
 import { Editor } from '@tinymce/tinymce-react';
-
+import { UserProvider } from './hooks/userContext';
 
 function App() {
   return (
     
     <>
     <Router>
+      <UserProvider>
       <Navbar />
       
       <main className='container mx-auto px-3 pb-12'>
@@ -38,15 +39,21 @@ function App() {
             <Route path='/register' element={<SignUp />} />
             <Route path='/create-listing' element={<CreateListing />} />
             <Route path='/edit-listing/:listingId' element={<EditListing />} />
-            <Route path='/listing/:listingId' element={<Listing />} />
-            <Route path='/profile' element={<PrivateRoute />}>
-          <Route path='/profile' element={<Profile />} />
+            <Route path='/listing/:listingId' element={
+              <PrivateRoute>
+              <Listing />
+              </PrivateRoute>
+              } />
+          <Route path='/profile' element={
+            <PrivateRoute>
+            <Profile />
+            </PrivateRoute>} />
 
-        </Route>
         </Routes>
       </main>
       
       <Footer />
+      </UserProvider>
     </Router>
     <ToastContainer />
 

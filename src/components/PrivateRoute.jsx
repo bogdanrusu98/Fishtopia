@@ -1,16 +1,20 @@
-import {Navigate, Outlet} from 'react-router-dom'
-import { useAuthStatus } from '../hooks/useAuthStatus'
+import React from 'react';
+import { Navigate } from 'react-router-dom';
+import { useUser } from '../hooks/userContext';
+import { toast } from 'react-toastify';
 
+const PrivateRoute = ({ children }) => {
+  const user = useUser();
 
-function PrivateRoute() {
-    const {loggedIn, checkingStatus} = useAuthStatus()
-
-    if(checkingStatus) {
-        return 'Loading...'
-    }
-
-   return loggedIn ? <Outlet /> : <Navigate to="/login" />
- }
+  if (!user) {
+    toast.error('You have to be logged in to access this page')
+    return (
+    <Navigate to="/login" />
+    )
+  }
  
- export default PrivateRoute
- 
+
+  return children;
+};
+
+export default PrivateRoute;

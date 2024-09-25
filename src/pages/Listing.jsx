@@ -11,14 +11,15 @@ import { getAuth } from "firebase/auth";
 import "swiper/css/pagination";
 import "swiper/css/navigation";
 import { RiErrorWarningFill } from "react-icons/ri";
-
+import Comments from "../components/Comments";
+import { useUser } from '../hooks/userContext';
 
 SwiperCore.use([Navigation, Pagination, Zoom]);
 
 function Listing() {
   const [listing, setListing] = useState(null);
   const [userName, setUserName] = useState(null);
-
+  const user = useUser()
   const navigate = useNavigate();
   const auth = getAuth();
   const params = useParams();
@@ -38,47 +39,21 @@ function Listing() {
     fetchListing(); // Obține listing-ul
   }, [params.listingId]); // Se declanșează când listingId se schimbă
   
-  useEffect(() => {
-    const fetchUserName = async () => {
-      if (!listing || !listing.userRef) {
-        console.log("Listing or userRef is null/undefined");
-        return; // Oprește execuția dacă listing sau userRef nu sunt definite
-      }
-  
-      // Creăm referința directă la documentul utilizatorului
-      const userDocRef = doc(db, "users", listing.userRef);
-  
-      try {
-        const userDocSnap = await getDoc(userDocRef); // Obținem documentul specific
-  
-        if (userDocSnap.exists()) {
-          setUserName(userDocSnap.data().name); // Setăm numele dacă documentul există
-        } else {
-          console.log("No matching user found");
-        }
-      } catch (error) {
-        console.error("Error fetching user: ", error);
-      }
-    };
-  
-    if (listing) {
-      fetchUserName(); // Apelăm fetchUserName doar când listing a fost setat
-    }
-  }, [listing]); // Efectul se declanșează când `listing` se schimbă
+
   
   return (
     <main>
       {listing ? (
         <>
                     <Swiper
-            slidesPerView={"auto"}
+            slidesPerView={"1"}
             pagination={{ type: "progressbar" }}
             touch={false}
             simulateTouch={false}
             navigation={true}
             zoom
-            zoomMaxRatio={3}
-            zoomMinRatio={1}
+            zoommaxratio={3}
+            zoomminratio={1}
             className="w-auto"
           >
             {listing.imgUrls.map((url, index) => (
@@ -106,7 +81,7 @@ function Listing() {
               </li>
               <li>
                 Created by:
-                <span className="text-black"> {userName}</span>
+                <span className="text-black"> {user.displayName}</span>
               </li>
             </ul>
             {auth.currentUser?.uid !== listing.userRef && (
@@ -139,6 +114,8 @@ function Listing() {
       ) : (
         <p>Loading...</p>
       )}
+
+      <Comments />
     </main>
   );
 }
