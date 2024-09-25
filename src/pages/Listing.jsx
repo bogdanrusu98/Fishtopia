@@ -39,14 +39,40 @@ function Listing() {
     fetchListing(); // Obține listing-ul
   }, [params.listingId]); // Se declanșează când listingId se schimbă
   
-
+  useEffect(() => {
+    const fetchUserName = async () => {
+      if (!listing || !listing.userRef) {
+        console.log("Listing or userRef is null/undefined");
+        return; // Oprește execuția dacă listing sau userRef nu sunt definite
+      }
+  
+      // Creăm referința directă la documentul utilizatorului
+      const userDocRef = doc(db, "users", listing.userRef);
+  
+      try {
+        const userDocSnap = await getDoc(userDocRef); // Obținem documentul specific
+  
+        if (userDocSnap.exists()) {
+          setUserName(userDocSnap.data().name); // Setăm numele dacă documentul există
+        } else {
+          console.log("No matching user found");
+        }
+      } catch (error) {
+        console.error("Error fetching user: ", error);
+      }
+    };
+  
+    if (listing) {
+      fetchUserName(); // Apelăm fetchUserName doar când listing a fost setat
+    }
+  }, [listing]); // Efectul se declanșează când `listing` se schimbă
   
   return (
     <main>
       {listing ? (
         <>
                     <Swiper
-            slidesPerView={"1"}
+            slidesPerView={"auto"}
             pagination={{ type: "progressbar" }}
             touch={false}
             simulateTouch={false}
@@ -81,7 +107,7 @@ function Listing() {
               </li>
               <li>
                 Created by:
-                <span className="text-black"> {user.displayName}</span>
+                <span className="text-black"> {userName}</span>
               </li>
             </ul>
             {auth.currentUser?.uid !== listing.userRef && (
