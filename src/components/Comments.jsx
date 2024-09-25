@@ -32,7 +32,7 @@ function Comments() {
     await addDoc(collection(db, 'comments'), {
       userId: newComment.userId,
       fullName: newComment.fullName,
-      avatarUrl: user.photoURL,
+      avatarUrl: user.photoURL ? user.photoURL : "https://flowbite.com/docs/images/people/profile-picture-5.jpg",
       text: newComment.text,
       replies: [],
       listingRef: listingId // Adăugăm listingId la comentariu
