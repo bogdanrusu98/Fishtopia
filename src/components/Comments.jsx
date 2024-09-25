@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { CommentSection } from 'react-comments-section';
 import 'react-comments-section/dist/index.css';
-import { collection, getDocs, getDoc, addDoc, query, where, deleteDoc, doc, updateDoc,  arrayUnion } from 'firebase/firestore';
-import { db } from '../firebase.config'; 
+import { collection, getDocs, getDoc, addDoc, query, where, deleteDoc, doc, updateDoc, arrayUnion } from 'firebase/firestore';
+import { db } from '../firebase.config';
 import { useUser } from '../hooks/userContext';
 import { useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -41,13 +41,13 @@ function Comments() {
     fetchComments(listingId); // Reîncărcăm comentariile pentru acest listing
   };
 
-  const handleUpdateComment = async ({comId, parentOfEditedCommentId, text}) => {
+  const handleUpdateComment = async ({ comId, parentOfEditedCommentId, text }) => {
     console.log(comId)
     console.log(text)
 
     // Dacă este un comentariu de top-level
     const commentRef = doc(db, 'comments', comId);
-    await updateDoc(commentRef, { text: text});
+    await updateDoc(commentRef, { text: text });
     toast.success('Comment edited')
   };
 
@@ -57,11 +57,11 @@ function Comments() {
         // Dacă este un răspuns la alt comentariu
         const parentCommentRef = doc(db, 'comments', parentOfDeleteId);
         const parentCommentSnapshot = await getDoc(parentCommentRef);
-  
+
         if (parentCommentSnapshot.exists()) {
           const parentCommentData = parentCommentSnapshot.data();
           const updatedReplies = parentCommentData.replies.filter(reply => reply.comId !== comIdToDelete);
-  
+
           await updateDoc(parentCommentRef, { replies: updatedReplies });
           console.log('Reply deleted successfully');
         } else {
@@ -73,14 +73,14 @@ function Comments() {
         await deleteDoc(commentRef);
         toast.success('Comment deleted successfully');
       }
-  
+
       fetchComments(listingId); // Actualizează comentariile după ștergere
     } catch (error) {
       console.error("Error deleting comment:", error);
     }
   };
 
-  const handleReplyComment = async ({text, repliedToCommentId, userId, fullName, avatarUrl}) => {
+  const handleReplyComment = async ({ text, repliedToCommentId, userId, fullName, avatarUrl }) => {
     try {
       const commentRef = doc(db, "comments", repliedToCommentId);
       await updateDoc(commentRef, {
@@ -98,7 +98,7 @@ function Comments() {
       console.log(repliedToCommentId)
     }
   };
-  
+
   return (
     <div>
       <CommentSection
@@ -119,8 +119,8 @@ function Comments() {
         onEditAction={(data) => handleUpdateComment(data)} // Edităm comentariul
         onDeleteAction={(data) => handleDeleteComment(data)}
         onReplyAction={(data) => handleReplyComment(data)}
-        />
-        
+      />
+
     </div>
   )
 }
