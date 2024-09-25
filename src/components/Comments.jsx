@@ -80,8 +80,9 @@ function Comments() {
     }
   };
 
-  const handleReplyComment = async ({ text, repliedToCommentId, userId, fullName, avatarUrl }) => {
+  const handleReplyComment = async ({ text, repliedToCommentId, userId, fullName, avatarUrl, parentOfRepliedCommentId }) => {
     try {
+      if (!parentOfRepliedCommentId) {
       const commentRef = doc(db, "comments", repliedToCommentId);
       await updateDoc(commentRef, {
         replies: arrayUnion({
@@ -93,9 +94,22 @@ function Comments() {
         })
       });
       console.log("Reply adăugat cu succes!");
+    } else {
+      const commentRef = doc(db, "comments", parentOfRepliedCommentId);
+      await updateDoc(commentRef, {
+        replies: arrayUnion({
+          text,
+          timestamp: new Date(),
+          userId,
+          parentOfRepliedCommentId: user.uid,
+          fullName: fullName,
+          avatarUrl: avatarUrl
+        })
+      });
+    }
     } catch (e) {
       console.error("Eroare la adăugarea reply-ului: ", e);
-      console.log(repliedToCommentId)
+      console.log(parentOfRepliedCommentId)
     }
   };
 
