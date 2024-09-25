@@ -72,7 +72,7 @@ function Listing() {
       {listing ? (
         <>
                     <Swiper
-            slidesPerView={"auto"}
+            slidesPerView={1}
             pagination={{ type: "progressbar" }}
             touch={false}
             simulateTouch={false}
