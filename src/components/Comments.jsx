@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { CommentSection } from 'react-comments-section';
 import 'react-comments-section/dist/index.css';
-import { collection, getDocs, getDoc, addDoc, query, where, deleteDoc, doc, updateDoc } from 'firebase/firestore';
+import { collection, getDocs, getDoc, addDoc, query, where, deleteDoc, doc, updateDoc,  arrayUnion } from 'firebase/firestore';
 import { db } from '../firebase.config'; 
 import { useUser } from '../hooks/userContext';
 import { useParams } from 'react-router-dom';
@@ -79,6 +79,25 @@ function Comments() {
       console.error("Error deleting comment:", error);
     }
   };
+
+  const handleReplyComment = async ({text, repliedToCommentId, userId, fullName, avatarUrl}) => {
+    try {
+      const commentRef = doc(db, "comments", repliedToCommentId);
+      await updateDoc(commentRef, {
+        replies: arrayUnion({
+          text,
+          timestamp: new Date(),
+          userId,
+          fullName: fullName,
+          avatarUrl: avatarUrl
+        })
+      });
+      console.log("Reply adăugat cu succes!");
+    } catch (e) {
+      console.error("Eroare la adăugarea reply-ului: ", e);
+      console.log(repliedToCommentId)
+    }
+  };
   
   return (
     <div>
@@ -99,6 +118,7 @@ function Comments() {
         onSubmitAction={(data) => handleAddComment(data)} // Adăugăm comentariul în Firestore
         onEditAction={(data) => handleUpdateComment(data)} // Edităm comentariul
         onDeleteAction={(data) => handleDeleteComment(data)}
+        onReplyAction={(data) => handleReplyComment(data)}
         />
         
     </div>
