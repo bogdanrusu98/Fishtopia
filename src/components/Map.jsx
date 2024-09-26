@@ -11,7 +11,7 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png',
 });
 
-function Map({ position, setPosition }) {
+function Map({ position, setPosition, draggable = true }) {
   const [markerPosition, setMarkerPosition] = useState(position);
 
   useEffect(() => {
@@ -44,7 +44,7 @@ function Map({ position, setPosition }) {
       {markerPosition && (
         <Marker
           position={markerPosition} // Set marker position
-          draggable={true}
+          draggable={draggable}
           eventHandlers={{
             dragend: handleDragEnd,
           }}

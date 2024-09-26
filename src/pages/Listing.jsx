@@ -100,11 +100,10 @@ function Listing() {
             {" "}
             <br />
             <h2 className="mb-2 text-4xl font-semibold text-gray-900 ">
-              {listing.name}
+              {listing.title}
             </h2>
             <ul className="max-w-md space-y-1 text-lg text-zinc-500 list-none list-inside dark:text-zinc-400">
-              <li>Risc de disparitie: {listing.risk}</li>
-              <li>Tara: {listing.country}</li>
+              <li>Peste: {listing.name}</li>
               <li>
                 Inaltime si greutate: {listing.length}, {listing.weight}
               </li>
@@ -142,7 +141,7 @@ function Listing() {
           {listing.latitude && listing.longitude ? (
             <>
             <br />
-            <Map position={[listing.latitude, listing.longitude]} />
+            <Map  position={[listing.latitude, listing.longitude]} draggable={false}/>
 </>
           ) : ''}
         </>

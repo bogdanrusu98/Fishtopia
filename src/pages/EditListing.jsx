@@ -27,7 +27,7 @@ function EditListing() {
   // eslint-disable-next-line
   const [formData, setFormData] = useState({
     name: "",
-    country: "",
+    title: "",
     images: {},
     length: "",
     risk: "",
@@ -35,7 +35,7 @@ function EditListing() {
     weight: "",
   });
 
-  const { name, country, images, length, risk, weight, description } = formData;
+  const { name, title, images, length, risk, weight, description } = formData;
 
   const [loading, setLoading] = useState(false);
   const [listing, setListing] = useState(null);
@@ -244,15 +244,15 @@ function EditListing() {
 
           <div className="mb-4">
             <label
-              htmlFor="country"
+              htmlFor="title"
               className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-200"
             >
-              Country
+              title
             </label>
             <input
               type="text"
-              id="country"
-              value={country}
+              id="title"
+              value={title}
               onChange={onMutate}
               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-purple-500 focus:border-purple-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
               required

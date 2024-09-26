@@ -27,7 +27,7 @@ function CreateListing() {
 
   const [formData, setFormData] = useState({
     name: "",
-    country: '',
+    title: '',
     images: {},
     length: '',
     risk: '',
@@ -39,7 +39,7 @@ function CreateListing() {
 
   const {
     name,
-    country,
+    title,
     images,
     length,
     risk,
@@ -254,35 +254,23 @@ navigate(`/`);
   <h2 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white text-center">Create a Fish Listing</h2>
 
   <div className="mb-4">
+    <label htmlFor="title" className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-200">Title</label>
+    <input
+      type="text"
+      id="title"
+      value={title}
+      onChange={onMutate}
+      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-purple-500 focus:border-purple-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+      required
+    />
+  </div>
+
+  <div className="mb-4">
     <label htmlFor="name" className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-200">Fish Name</label>
     <input
       type="text"
       id="name"
       value={name}
-      onChange={onMutate}
-      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-purple-500 focus:border-purple-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
-      required
-    />
-  </div>
-
-  <div className="mb-4">
-    <label htmlFor="country" className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-200">Country</label>
-    <input
-      type="text"
-      id="country"
-      value={country}
-      onChange={onMutate}
-      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-purple-500 focus:border-purple-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
-      required
-    />
-  </div>
-
-  <div className="mb-4">
-    <label htmlFor="risk" className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-200">Risk Level</label>
-    <input
-      type="text"
-      id="risk"
-      value={risk}
       onChange={onMutate}
       className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-purple-500 focus:border-purple-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
       required

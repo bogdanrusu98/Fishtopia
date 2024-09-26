@@ -28,11 +28,10 @@ function FishResults( {listing, id, onDelete}) {
     </Link>
     <div className="p-5">
     <Link to={`/listing/${id}`}>
-        <h5 className="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">{listing.name}</h5>
+        <h5 className="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">{listing.title}</h5>
       </Link>
       <ul className="mb-3 font-normal text-gray-700 dark:text-gray-400">
-        <li>Țara: {listing.country}</li>
-        <li>Risc: {listing.risk}</li>
+        <li>Peste: {listing.name}</li>
         <li>Lungime: {listing.length}</li>
         <li>Greutate: {listing.weight}</li>
       </ul>
