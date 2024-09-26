@@ -33,8 +33,8 @@ function CreateListing() {
     risk: '',
     description: '',
     weight: '',
-    latitude: '',
-    longitude: ''
+    latitude: position[0],  // Setează latitudinea inițială
+    longitude: position[1]  // Setează longitudinea inițială
   });
 
   const {
@@ -94,8 +94,8 @@ function CreateListing() {
     setAddress(displayName); // Setează adresa selectată în input
     setFormData((prevState) => ({
       ...prevState,
-      latitude: lat,
-      longitude: lon
+      latitude: parseFloat(lat),  // Asigură-te că valorile sunt numerice
+      longitude: parseFloat(lon), // Asigură-te că valorile sunt numerice
     }));
     setSuggestions([]); // Golește sugestiile
   };
@@ -104,17 +104,24 @@ function CreateListing() {
     const newLatLng = e.target.getLatLng();
     setMarkerPosition([newLatLng.lat, newLatLng.lng]);
     setPosition([newLatLng.lat, newLatLng.lng]);
+    
+    // Actualizăm direct formData pentru a ne asigura că valorile sunt salvate
     setFormData((prevState) => ({
       ...prevState,
       latitude: newLatLng.lat,
       longitude: newLatLng.lng,
     }));
+    console.log('data', newLatLng.lat, newLatLng.lng)
   };
 
   const onSubmit = async (e) => {
     e.preventDefault();
 
-
+    if (!latitude || !longitude) {
+      toast.error('Latitude and longitude are required');
+      return;
+    }
+  
     if(images.length > 6) {
       setLoading(false)
       toast.error('Max 6 images')
@@ -177,28 +184,29 @@ function CreateListing() {
         );
       })
     }
+ // Upload images and save data
+ const imgUrls = await Promise.all(
+  [...images].map((image) => storeImage(image))
+).catch(() => {
+  setLoading(false)
+  toast.error('Images not uploaded')
+  return
+})
 
-    const imgUrls = await Promise.all(
-      [...images].map((image) => storeImage(image))
-    ).catch(() => {
-      setLoading(false)
-      toast.error('Images not uploaded')
-      return
-    })
+const formDataCopy = {
+  ...formData,
+  imgUrls,
+  timestamp: serverTimestamp(),
+  latitude: parseFloat(latitude),  // Asigură-te că valorile sunt numerice
+  longitude: parseFloat(longitude) // Asigură-te că valorile sunt numerice
+}
 
-    const formDataCopy = {
-      ...formData,
-      imgUrls,
-      timestamp: serverTimestamp(),
-    }
+delete formDataCopy.images
+const docRef = await addDoc(collection(db, 'listings'), formDataCopy)
 
-    delete formDataCopy.images
-    const docRef = await addDoc(collection(db, 'listings'), formDataCopy)
-
-    setLoading(false)
-    toast.success('Listing saved')
-    console.log(formDataCopy.type, docRef.id);
-    navigate(`/`);
+setLoading(false)
+toast.success('Listing saved')
+navigate(`/`);
   };
 
   const onMutate = (e) => {
