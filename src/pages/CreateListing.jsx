@@ -12,8 +12,14 @@ import {toast} from 'react-toastify'
 import {v4 as uuidv4} from 'uuid'
 import {addDoc, collection, serverTimestamp} from 'firebase/firestore'
 import { Editor } from '@tinymce/tinymce-react';
+import axios from 'axios';
+import Map from '../components/Map';
 
 function CreateListing() {
+  const [address, setAddress] = useState('');
+  const [suggestions, setSuggestions] = useState([]);
+  const [position, setPosition] = useState([45.9432, 24.9668]);
+  const [markerPosition, setMarkerPosition] = useState('')
 
   // eslint-disable-next-line
   const [geolocationEnabled, setGeolocationEnabled] = useState(true);
@@ -27,6 +33,8 @@ function CreateListing() {
     risk: '',
     description: '',
     weight: '',
+    latitude: '',
+    longitude: ''
   });
 
   const {
@@ -37,6 +45,8 @@ function CreateListing() {
     risk,
     weight,
     description,
+    latitude, 
+    longitude
   } = formData;
 
   const [loading, setLoading] = useState(false);
@@ -61,6 +71,45 @@ function CreateListing() {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isMounted]);
+
+
+  const handleAddressChange = async (e) => {
+    setAddress(e.target.value);
+    if (e.target.value.length > 2) {
+      try {
+        const response = await axios.get(
+          `https://nominatim.openstreetmap.org/search?format=json&q=${e.target.value}`
+        );
+        setSuggestions(response.data);
+      } catch (error) {
+        console.error("Eroare la obținerea sugestiilor: ", error);
+      }
+    } else {
+      setSuggestions([]);
+    }
+  };
+
+  const handleSuggestionClick = (lat, lon, displayName) => {
+    setPosition([parseFloat(lat), parseFloat(lon)]); // Actualizează poziția pe hartă
+    setAddress(displayName); // Setează adresa selectată în input
+    setFormData((prevState) => ({
+      ...prevState,
+      latitude: lat,
+      longitude: lon
+    }));
+    setSuggestions([]); // Golește sugestiile
+  };
+  
+  const handleDragEnd = (e) => {
+    const newLatLng = e.target.getLatLng();
+    setMarkerPosition([newLatLng.lat, newLatLng.lng]);
+    setPosition([newLatLng.lat, newLatLng.lng]);
+    setFormData((prevState) => ({
+      ...prevState,
+      latitude: newLatLng.lat,
+      longitude: newLatLng.lng,
+    }));
+  };
 
   const onSubmit = async (e) => {
     e.preventDefault();
@@ -283,6 +332,32 @@ function CreateListing() {
     }))}
   />
         </div>
+
+        <div className="mb-4">
+  <label htmlFor="address" className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-200">
+    Address
+  </label>
+  <input
+    type="text"
+    value={address}
+    onChange={handleAddressChange}
+    placeholder="Introduceți adresa"
+    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-purple-500 focus:border-purple-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+  />
+  <ul style={{ listStyle: 'none', padding: 0 }}>
+    {suggestions.map((suggestion, index) => (
+      <li
+        key={index}
+        onClick={() => handleSuggestionClick(suggestion.lat, suggestion.lon, suggestion.display_name)}
+        style={{ cursor: 'pointer', padding: '5px', borderBottom: '1px solid #ccc' }}
+      >
+        {suggestion.display_name}
+      </li>
+    ))}
+  </ul>
+
+  <Map position={position} setPosition={setPosition} />
+</div>
 
   <div className="mb-6">
     <label htmlFor="images" className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-200">Upload Image</label>

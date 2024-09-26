@@ -13,6 +13,8 @@ import "swiper/css/navigation";
 import { RiErrorWarningFill } from "react-icons/ri";
 import Comments from "../components/Comments";
 import { useUser } from '../hooks/userContext';
+import Map from "../components/Map";
+import axios from 'axios';
 
 SwiperCore.use([Navigation, Pagination, Zoom]);
 
@@ -23,6 +25,7 @@ function Listing() {
   const navigate = useNavigate();
   const auth = getAuth();
   const params = useParams();
+  
 
   useEffect(() => {
     const fetchListing = async () => {
@@ -136,12 +139,18 @@ function Listing() {
               
             </>
           )}
+          {listing.latitude && listing.longitude ? (
+            <>
+            <br />
+            <Map position={[listing.latitude, listing.longitude]} />
+</>
+          ) : ''}
         </>
       ) : (
         <p>Loading...</p>
       )}
-
-      <Comments />
+  <br />
+  <Comments />
     </main>
   );
 }
