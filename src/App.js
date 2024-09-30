@@ -5,6 +5,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import Navbar from './components/layout/Navbar';
 import PropTypes from 'prop-types'
 import Home from './pages/Home';
+import { useDarkMode } from './hooks/DarkModeToggle';
 import About from './pages/About';
 import Footer from './components/layout/Footer';
 import NotFound from './pages/NotFound';
@@ -21,6 +22,8 @@ import { Editor } from '@tinymce/tinymce-react';
 import { UserProvider } from './hooks/userContext';
 
 function App() {
+  const [darkMode, setDarkMode] = useDarkMode(); // Folosește hook-ul pentru a gestiona tema
+
   return (
     
     <>
@@ -28,8 +31,8 @@ function App() {
       <UserProvider>
       <Navbar />
       
-      <main className='container mx-auto px-3 pb-12'>
-        <Routes>
+      <div className={`container mx-auto px-3 pb-12 ${darkMode ? 'dark' : ''}`}>
+      <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/about" element={<About />} />
             <Route path="/notfound" element={<NotFound />} />
@@ -50,13 +53,12 @@ function App() {
             </PrivateRoute>} />
 
         </Routes>
-      </main>
+      </div>
       
       <Footer />
       </UserProvider>
     </Router>
     <ToastContainer />
-
     </>
   );
   
