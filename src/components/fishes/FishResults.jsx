@@ -15,7 +15,8 @@ function FishResults({ listing, id }) {
   const user = useUser();
   const navigate = useNavigate()
   const [listings, setListings] = useState([]);
-
+  const [userName, setUserName] = useState(null);
+  const [userAvatar, setUserAvatar] = useState(""); // State pentru avatar
   const [likes, setLikes] = useState(0);
   const [commentsCount, setCommentsCount] = useState(0); // Setează numărul de comentarii
   const [liked, setLiked] = useState(false); // Stare pentru a urmări dacă utilizatorul a dat like
@@ -118,56 +119,86 @@ function FishResults({ listing, id }) {
     return text;
   };
 
+  useEffect(() => {
+    const fetchUserDetails = async () => {
+      if (!listing || !listing.userRef) {
+        return;
+      }
+
+      const userDocRef = doc(db, "users", listing.userRef);
+
+      try {
+        const userDocSnap = await getDoc(userDocRef);
+
+        if (userDocSnap.exists()) {
+          const userData = userDocSnap.data();
+          setUserName(userData.name); // Setează numele utilizatorului
+          setUserAvatar(userData.avatar); // Setează avatarul utilizatorului
+        } else {
+          console.log("No matching user found");
+        }
+      } catch (error) {
+        console.error("Error fetching user: ", error);
+      }
+    };
+
+    if (listing) {
+      fetchUserDetails();
+    }
+  }, [listing]);
+
   return (
-    <div className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 w-full p-6">
+  <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 w-full p-6">
     {/* Flex pentru a poziționa butonul în dreapta */}
     <div className="flex items-center justify-between mb-4">
       <div className="flex items-center">
         <img
-          src={listing.user?.avatar  || "https://flowbite.com/docs/images/people/profile-picture-5.jpg"}
-          alt={listing.user?.name || 'Anonim'}
+          src={userAvatar || "https://flowbite.com/docs/images/people/profile-picture-5.jpg"}
+          alt={userName || 'Anonim'}
           className="w-10 h-10 rounded-full mr-3"
         />
-        <span className="text-gray-700 font-semibold">{listing.user?.name || 'Anonim'}</span>
+        <span className="text-gray-700 dark:text-gray-300 font-semibold">{userName || 'Anonim'}</span>
       </div>
-  
-      {user && user.uid === listing.userRef ? (
-  <>
-    {/* Dropdown pentru butonul cu 3 puncte */}
-    <Dropdown
-      arrowIcon={false}
-      inline={true}
-      label={
-        <svg className="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 4 15">
-          <path d="M3.5 1.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Zm0 6.041a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Zm0 5.959a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Z" />
-        </svg>
-      }
-    >
-      <Dropdown.Item onClick={() => handleEdit(id)}>
-        <FaEdit className="mr-2" />
-        Edit
-      </Dropdown.Item>
-      <Dropdown.Item onClick={() => onDelete(id)}>
-        <FaTrashAlt className="mr-2" />
-        Delete
-      </Dropdown.Item>
-    </Dropdown>
-  </>
-) : null}
 
-      </div>
-  
+      {user && user.uid === listing.userRef ? (
+        <>
+          {/* Dropdown pentru butonul cu 3 puncte */}
+          <Dropdown
+            arrowIcon={false}
+            inline={true}
+            label={
+              <svg className="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 4 15">
+                <path d="M3.5 1.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Zm0 6.041a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Zm0 5.959a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Z" />
+              </svg>
+            }
+          >
+            <Dropdown.Item onClick={() => handleEdit(id)}>
+              <FaEdit className="mr-2" />
+              Edit
+            </Dropdown.Item>
+            <Dropdown.Item onClick={() => onDelete(id)}>
+              <FaTrashAlt className="mr-2" />
+              Delete
+            </Dropdown.Item>
+          </Dropdown>
+        </>
+      ) : null}
+    </div>
+
     <Link to={`/listing/${id}`}>
-      <h2 className="text-2xl font-bold text-gray-800 mb-2">{listing.title}</h2>
-  
+      <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-2">{listing.title}</h2>
+
       {listing.imgUrls && (
         <img src={listing.imgUrls} alt={listing.title} className="w-full h-auto rounded-lg mb-4" />
       )}
     </Link>
-  
+
     {/* Descrierea cu text trunchiat */}
-    <span dangerouslySetInnerHTML={{ __html: truncateText(listing.description, 20) }}></span>
-  
+    <span
+      className="text-gray-700 dark:text-gray-300"
+      dangerouslySetInnerHTML={{ __html: truncateText(listing.description, 20) }}
+    ></span>
+
     {/* Butoane Like și Comment stilizate */}
     <div className="flex justify-between items-center mt-6 space-x-4">
       {/* Buton Like */}
@@ -180,7 +211,7 @@ function FishResults({ listing, id }) {
         <FaThumbsUp className="text-xl" />
         <span className="font-semibold">{likes} Likes</span>
       </button>
-  
+
       {/* Buton Comments */}
       <Link
         to={`/listing/${id}`}
@@ -190,13 +221,14 @@ function FishResults({ listing, id }) {
         <span className="font-semibold">{commentsCount} Comments</span>
       </Link>
     </div>
-  
+
     {/* Alte detalii */}
-    <div className="text-gray-500 text-sm mt-4">
+    <div className="text-gray-500 dark:text-gray-400 text-sm mt-4">
       <p>{formatDistanceToNow(listing.timestamp?.toDate())} ago</p>
     </div>
   </div>
-  
+
+
   );
 }
 

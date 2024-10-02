@@ -36,6 +36,12 @@ function Navbar({title}) {
     navigate('/')
   };
 
+  const handleThemeToggle = () => {
+    setDarkMode(!darkMode);
+    // Forțează refresh-ul paginii pentru a aplica tema
+    window.location.reload();
+  };
+  
   return (
     <nav className='navbar mb-12 shadow-lg bg-neutral text-neutral-content'>
     <div className='container mx-auto'>
@@ -52,7 +58,7 @@ function Navbar({title}) {
             <>
               {/* Butonul de toggle Dark Mode */}
               <button
-              onClick={() => setDarkMode(!darkMode)}
+              onClick={handleThemeToggle}
               className={`btn btn-sm rounded-btn transition duration-500 ease-in-out shadow-md focus:outline-none ${
                 darkMode ? 'bg-gray-800 text-yellow-300' : 'bg-gray-200 text-gray-800'
               }`}

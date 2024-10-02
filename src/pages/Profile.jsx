@@ -16,10 +16,17 @@ import {
   getDownloadURL
 } from 'firebase/storage';
 import { updateProfile, updateEmail, updatePassword } from "firebase/auth";
+import { initFlowbite } from 'flowbite';
+
 
 const storage = getStorage(); // Inițializează Firebase Storage
 
 function Profile() {
+
+  useEffect(() => {
+    initFlowbite()
+  }, [])
+
   const user = useUser();
   const [listings, setListings] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -157,7 +164,9 @@ function Profile() {
       alt={user?.displayName || 'Anonim'}
       className="w-40 h-40 rounded-full mr-3"
     />
-    <span className="text-gray-700 text-3xl text-5xl font-semibold">{user?.displayName || 'Anonim'}</span>
+<span className="text-gray-700 dark:text-gray-200 text-5xl font-semibold">
+  {user?.displayName || 'Anonim'}
+</span>
   </div>
 
   {/* Butonul Edit Profile */}
@@ -236,9 +245,20 @@ function Profile() {
       )}
 
 
-      <hr className="my-4" />
+<div className="mb-4 border-b border-gray-200 dark:border-gray-700">
+    <ul className="flex flex-wrap -mb-px text-sm font-medium text-center" id="default-tab" data-tabs-toggle="#default-tab-content" role="tablist">
+        <li className="me-2" role="presentation">
+            <button className="inline-block p-4 border-b-2 rounded-t-lg" id="profile-tab" data-tabs-target="#profile" type="button" role="tab" aria-controls="profile" aria-selected="false">Posts</button>
+        </li>
+        <li className="me-2" role="presentation">
+            <button className="inline-block p-4 border-b-2 rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300" id="dashboard-tab" data-tabs-target="#dashboard" type="button" role="tab" aria-controls="dashboard" aria-selected="false">Comments</button>
+        </li>
 
-      <div className="flex flex-wrap gap-4 mt-4">
+    </ul>
+</div>
+<div id="default-tab-content">
+    <div className="hidden p-4 rounded-lg bg-gray-50 dark:bg-gray-800" id="profile" role="tabpanel" aria-labelledby="profile-tab">
+    <div className="flex flex-wrap gap-4 mt-4">
         
         {loading ? (
           <div className="text-center">
@@ -264,6 +284,18 @@ function Profile() {
           <p>No listings found</p>
         )}
       </div>
+
+    </div>
+    <div className="hidden p-4 rounded-lg bg-gray-50 dark:bg-gray-800" id="dashboard" role="tabpanel" aria-labelledby="dashboard-tab">
+        Still Working
+    </div>
+    
+</div>
+
+
+      <hr className="my-4" />
+
+     
     </div>
   );
 }

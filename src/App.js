@@ -1,7 +1,8 @@
 import {BrowserRouter as Router, Route, Routes} from 'react-router-dom'
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-
+import { useEffect } from 'react';
+import { initFlowbite } from 'flowbite';
 import Navbar from './components/layout/Navbar';
 import PropTypes from 'prop-types'
 import Home from './pages/Home';
@@ -21,9 +22,11 @@ import ForgotPassword from './pages/ForgotPassword';
 import { Editor } from '@tinymce/tinymce-react';
 import { UserProvider } from './hooks/userContext';
 
+
 function App() {
   const [darkMode, setDarkMode] = useDarkMode(); // Folosește hook-ul pentru a gestiona tema
 
+  
   return (
     
     <>

@@ -27,7 +27,7 @@ function ForgotPassword() {
 return (
         <div>
     <header>
-        <p class='text-4xl text-center'>Forgot Password</p>
+        <p className='text-4xl text-center'>Forgot Password</p>
     </header>
 
 <main className='mt-10 sm:mx-auto sm:w-full sm:max-w-sm'>
