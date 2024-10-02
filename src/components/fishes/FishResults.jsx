@@ -203,19 +203,20 @@ function FishResults({ listing, id }) {
     <div className="flex justify-between items-center mt-6 space-x-4">
       {/* Buton Like */}
       <button
-        onClick={toggleLike}
-        className={`flex items-center justify-center space-x-2 px-4 py-2 rounded-md text-white transition duration-200 ${
-          liked ? 'bg-red-600' : 'bg-gray-400 hover:bg-red-500'
-        }`}
-      >
-        <FaThumbsUp className="text-xl" />
-        <span className="font-semibold">{likes} Likes</span>
-      </button>
+  onClick={toggleLike}
+  className={`flex items-center justify-center space-x-2 px-4 py-2 rounded-md text-white transition duration-200 ${
+    liked ? 'bg-red-600' : 'bg-gray-400 hover:bg-gray-500'
+  }`}
+>
+  <FaThumbsUp className="text-xl" />
+  <span className="font-semibold">{likes} Likes</span>
+</button>
+
 
       {/* Buton Comments */}
       <Link
         to={`/listing/${id}`}
-        className="flex items-center justify-center space-x-2 px-4 py-2 rounded-md bg-gray-400 hover:bg-blue-500 text-white transition duration-200"
+        className="flex items-center justify-center space-x-2 px-4 py-2 rounded-md bg-gray-400 hover:bg-gray-500 text-white transition duration-200"
       >
         <FaComments className="text-xl" />
         <span className="font-semibold">{commentsCount} Comments</span>
