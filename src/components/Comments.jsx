@@ -102,7 +102,7 @@ function Comments() {
 
   return (
     <div>
-      <section className="bg-white dark:bg-gray-900 py-8 lg:py-16 antialiased">
+      <section className="bg-white dark:bg-gray-900 py-4 lg:py-4 antialiased">
         <div className="max-w-2xl mx-4 px-4">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-lg lg:text-2xl font-bold text-gray-900 dark:text-white">
@@ -134,7 +134,7 @@ function Comments() {
 
           {/* Afișarea comentariilor */}
           {comments.map((comment) => (
-            <article key={comment.comId} className="p-6 mb-3 text-base bg-white border-t border-gray-200 dark:border-gray-700 dark:bg-gray-900">
+            <article key={comment.comId} className="p-6 pb-3 mb-3 text-base bg-white border-t border-gray-200 dark:border-gray-700 dark:bg-gray-900">
               <footer className="flex justify-between items-center mb-2">
                 <div className="flex items-center">
                   <p className="inline-flex items-center mr-3 text-sm text-gray-900 dark:text-white font-semibold">
@@ -211,7 +211,7 @@ function Comments() {
               {comment.replies && Object.values(comment.replies).length > 0 && (
   <div className="">
     {Object.values(comment.replies).map((reply, index) => (
-      <article key={index} className="p-6 mb-3 ml-6 lg:ml-12 text-base bg-white rounded-lg dark:bg-gray-900">
+      <article key={index} className="p-6 pb-0 ml-6 lg:ml-12 text-base bg-white rounded-lg dark:bg-gray-900">
         <footer className="flex justify-between items-center mb-2">
           <div className="flex items-center">
             <p className="inline-flex items-center mr-3 text-sm text-gray-900 dark:text-white font-semibold">
