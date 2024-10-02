@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { collection, getDocs, query, orderBy, limit, getDoc, doc } from 'firebase/firestore';
 import { db } from '../firebase.config';
 import { useState, useEffect, useMemo, useCallback } from "react";
@@ -58,6 +58,19 @@ function Home() {
 
   return (
     <div>
+      
+
+<div class="w-full p-4 text-center bg-white border border-gray-200 rounded-lg shadow sm:p-8 dark:bg-gray-800 dark:border-gray-700 mb-4">
+    <h5 class="mb-2 text-3xl font-bold text-gray-900 dark:text-white">Do you want to create a listing?</h5>
+    <div class="items-center justify-center space-y-4 sm:flex sm:space-y-0 sm:space-x-4 rtl:space-x-reverse">
+        <Link to='/create-listing' className="btn btn-primary w-full sm:w-auto  hover:bg-gray-700 focus:ring-4 focus:outline-none focus:ring-gray-300 text-white rounded-lg inline-flex items-center justify-center px-4 py-2.5 dark:bg-gray-700 dark:hover:bg-gray-600 dark:focus:ring-gray-700">
+            <div class="text-left rtl:text-right">
+                Create here
+            </div>
+        </Link>
+    </div>
+</div>
+
 
       <div className="flex flex-col items-center w-full">
         {loading ? (

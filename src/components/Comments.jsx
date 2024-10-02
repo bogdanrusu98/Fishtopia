@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { CommentSection } from 'react-comments-section';
 import 'react-comments-section/dist/index.css';
-import { collection, getDocs, getDoc, addDoc, query, where, deleteDoc, doc, updateDoc, arrayUnion } from 'firebase/firestore';
+import { collection, getDocs, getDoc, addDoc, query, where, deleteDoc, doc, updateDoc, arrayUnion, serverTimestamp } from 'firebase/firestore';
 import { db } from '../firebase.config';
 import { useUser } from '../hooks/userContext';
 import { useParams } from 'react-router-dom';
@@ -35,7 +35,8 @@ function Comments() {
       avatarUrl: user.photoURL ? user.photoURL : "https://flowbite.com/docs/images/people/profile-picture-5.jpg",
       text: newComment.text,
       replies: [],
-      listingRef: listingId // Adăugăm listingId la comentariu
+      listingRef: listingId, // Adăugăm listingId la comentariu
+      timestamp: serverTimestamp()
     });
 
     fetchComments(listingId); // Reîncărcăm comentariile pentru acest listing

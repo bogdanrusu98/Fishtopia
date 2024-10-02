@@ -60,7 +60,7 @@ function Navbar({title}) {
               {darkMode ? <FaSun className="text-lg" /> : <FaMoon className="text-lg" />}
             </button>
             
-              <Link to='/create-listing' className='btn btn-primary btn-sm rounded-btn'>Create Listing</Link>
+              <Link to='/create-listing' className='btn btn-primary btn-sm rounded-btn'>+</Link>
   
               {user ? (
                 <Dropdown

@@ -19,6 +19,7 @@ SwiperCore.use([Navigation, Pagination, Zoom]);
 function Listing() {
   const [listing, setListing] = useState(null);
   const [userName, setUserName] = useState(null);
+  const [userAvatar, setUserAvatar] = useState(""); // State pentru avatar
   const user = useUser();
   const navigate = useNavigate();
   const auth = getAuth();
@@ -40,7 +41,7 @@ function Listing() {
   }, [params.listingId]);
 
   useEffect(() => {
-    const fetchUserName = async () => {
+    const fetchUserDetails = async () => {
       if (!listing || !listing.userRef) {
         return;
       }
@@ -51,7 +52,9 @@ function Listing() {
         const userDocSnap = await getDoc(userDocRef);
 
         if (userDocSnap.exists()) {
-          setUserName(userDocSnap.data().name);
+          const userData = userDocSnap.data();
+          setUserName(userData.name); // Setează numele utilizatorului
+          setUserAvatar(userData.avatar); // Setează avatarul utilizatorului
         } else {
           console.log("No matching user found");
         }
@@ -61,10 +64,10 @@ function Listing() {
     };
 
     if (listing) {
-      fetchUserName();
+      fetchUserDetails();
     }
   }, [listing]);
-
+  
   return (
     <main >
                 <button
@@ -79,7 +82,7 @@ function Listing() {
           {/* Secțiunea de utilizator */}
           <div className="flex items-center mb-4">
             <img
-              src={listing.user?.avatar || "https://flowbite.com/docs/images/people/profile-picture-5.jpg"}
+              src={userAvatar || "https://flowbite.com/docs/images/people/profile-picture-5.jpg"}
               alt="User Avatar"
               className="w-10 h-10 rounded-full mr-3"
             />
@@ -101,7 +104,7 @@ function Listing() {
               pagination={{ type: "progressbar" }}
               navigation={true}
               zoom
-              className="w-full h-full"
+              className="max-w-2xl"
             >
               {listing.imgUrls.map((url, index) => (
                 <SwiperSlide key={index}>
