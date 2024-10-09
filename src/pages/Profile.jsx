@@ -179,7 +179,9 @@ function Profile() {
       console.log("Document updated successfully");
   
       toast.success("Profile updated successfully!");
-      await sendNotification(auth.currentUser.uid, 'You have changed your data')
+      await sendNotification({
+        userRef: auth.currentUser.uid, 
+        message: 'You have changed your data'})
       setIsModalOpen(false); // Închide modalul după actualizare
     } catch (error) {
       console.error("Error updating profile:", error);
