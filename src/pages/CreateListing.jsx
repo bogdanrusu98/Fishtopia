@@ -203,7 +203,7 @@ function CreateListing() {
                   onInit={(evt, editor) => editorRef.current = editor}
                   initialValue=""
                   init={{
-                    height: 150,
+                    height: 250,
                     menubar: false,
                     plugins: [
                       'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',

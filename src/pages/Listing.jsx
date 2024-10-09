@@ -1,6 +1,6 @@
 import { Swiper, SwiperSlide } from "swiper/react";
 import { useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, Link } from "react-router-dom";
 import { Navigation, Pagination, Zoom } from "swiper/modules";
 import SwiperCore from "swiper";
 import "swiper/css";
@@ -81,13 +81,18 @@ function Listing() {
           <>
             {/* Secțiunea de utilizator */}
             <div className="flex items-center mb-4">
+              <Link to={`/user/${listing.userRef}`}>
               <img
                 src={userAvatar || "https://flowbite.com/docs/images/people/profile-picture-5.jpg"}
                 alt="User Avatar"
                 className="w-10 h-10 rounded-full mr-3"
               />
+              </Link>
               <div className="text-gray-700 dark:text-gray-300">
+              <Link to={`/user/${listing.userRef}`}>
+
                 <p className="font-semibold">{userName || 'Anonim'}</p>
+                </Link>
                 <p className="text-sm text-gray-500 dark:text-gray-400">Posted by {userName || 'Anonim'}</p>
               </div>
             </div>

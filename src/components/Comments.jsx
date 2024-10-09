@@ -2,9 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { collection, getDocs, addDoc, query, where, updateDoc, doc, arrayUnion, serverTimestamp, getDoc, deleteDoc } from 'firebase/firestore';
 import { db } from '../firebase.config';
 import { useUser } from '../hooks/userContext';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { formatDistanceToNow } from 'date-fns';
+import { FaEdit, FaTrashAlt } from "react-icons/fa";
+import { Dropdown } from "flowbite-react";
 
 function Comments() {
   const { listingId } = useParams();
@@ -100,6 +102,15 @@ function Comments() {
   };
   
 
+ // onDelete function to remove a listing
+ 
+ const onDelete = async (commentId) => {
+  if (window.confirm('Are you sure you want to delete?')) {
+    await deleteDoc(doc(db, 'comments', listingId));
+    const updatedComments = comments.filter((comment) => comment.id !== commentId);
+    toast.success('Successfully deleted comment');
+  }
+};
   return (
     <div>
       <section className="bg-white dark:bg-gray-900 py-4 lg:py-4 antialiased">
@@ -109,11 +120,13 @@ function Comments() {
               Discussion ({comments.length})
             </h2>
           </div>
-
+  
           {/* Formularul pentru a adăuga comentarii */}
           <form className="mb-6" onSubmit={handleAddComment}>
             <div className="py-2 px-4 mb-4 bg-white rounded-lg rounded-t-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
-              <label htmlFor="comment" className="sr-only">Your comment</label>
+              <label htmlFor="comment" className="sr-only">
+                Your comment
+              </label>
               <textarea
                 id="comment"
                 rows="6"
@@ -131,18 +144,20 @@ function Comments() {
               Post comment
             </button>
           </form>
-
+  
           {/* Afișarea comentariilor */}
           {comments.map((comment) => (
             <article key={comment.comId} className="p-6 pb-3 mb-3 text-base bg-white border-t border-gray-200 dark:border-gray-700 dark:bg-gray-900">
-              <footer className="flex justify-between items-center mb-2">
+              <footer className="flex items-center mb-2">
                 <div className="flex items-center">
                   <p className="inline-flex items-center mr-3 text-sm text-gray-900 dark:text-white font-semibold">
-                    <img
-                      className="mr-2 w-6 h-6 rounded-full"
-                      src={comment.avatarUrl}
-                      alt={comment.fullName}
-                    />
+                    <Link to={`/user/${comment.userId}`}>
+                      <img
+                        className="mr-2 w-6 h-6 rounded-full"
+                        src={comment.avatarUrl}
+                        alt={comment.fullName}
+                      />
+                    </Link>
                     {comment.fullName}
                   </p>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
@@ -151,9 +166,28 @@ function Comments() {
                     </time>
                   </p>
                 </div>
+                {user && user.uid === comment.userId ? (
+                  <div className="ml-auto">
+                    {/* Dropdown pentru butonul cu 3 puncte */}
+                    <Dropdown
+                      arrowIcon={false}
+                      inline={true}
+                      label={
+                        <svg className="w-5 h-5 items-end" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 4 15">
+                          <path d="M3.5 1.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Zm0 6.041a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Zm0 5.959a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Z" />
+                        </svg>
+                      }
+                    >
+                      <Dropdown.Item onClick={() => onDelete(comment.comId)}>
+                        <FaTrashAlt className="mr-2" />
+                        Delete
+                      </Dropdown.Item>
+                    </Dropdown>
+                  </div>
+                ) : null}
               </footer>
               <p className="text-gray-500 dark:text-gray-400">{comment.text}</p>
-
+  
               {/* Butonul pentru reply */}
               <div className="flex items-center mt-4 space-x-4">
                 <button
@@ -178,7 +212,7 @@ function Comments() {
                   Reply
                 </button>
               </div>
-
+  
               {/* Formularul pentru reply */}
               {activeReplyId === comment.comId && (
                 <form
@@ -188,15 +222,15 @@ function Comments() {
                     handleReplyComment(comment.comId);
                   }}
                 >
-                  <div class="py-2 px-4 bg-white rounded-lg rounded-t-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
-                  <textarea
-                    className="px-0 w-full text-sm text-gray-900 border-0 focus:ring-0 focus:outline-none dark:text-white dark:placeholder-gray-400 dark:bg-gray-800"
-                    rows="2"
-                    placeholder="Write a reply..."
-                    value={replyText}
-                    onChange={(e) => setReplyText(e.target.value)}
-                    required
-                  />
+                  <div className="py-2 px-4 bg-white rounded-lg rounded-t-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
+                    <textarea
+                      className="px-0 w-full text-sm text-gray-900 border-0 focus:ring-0 focus:outline-none dark:text-white dark:placeholder-gray-400 dark:bg-gray-800"
+                      rows="2"
+                      placeholder="Write a reply..."
+                      value={replyText}
+                      onChange={(e) => setReplyText(e.target.value)}
+                      required
+                    />
                   </div>
                   <button
                     type="submit"
@@ -206,43 +240,40 @@ function Comments() {
                   </button>
                 </form>
               )}
-
+  
               {/* Afișăm și reply-urile */}
               {comment.replies && Object.values(comment.replies).length > 0 && (
-  <div className="">
-    {Object.values(comment.replies).map((reply, index) => (
-      <article key={index} className="p-6 pb-0 ml-6 lg:ml-12 text-base bg-white rounded-lg dark:bg-gray-900">
-        <footer className="flex justify-between items-center mb-2">
-          <div className="flex items-center">
-            <p className="inline-flex items-center mr-3 text-sm text-gray-900 dark:text-white font-semibold">
-              <img
-                className="mr-2 w-6 h-6 rounded-full"
-                src={reply.avatarUrl}
-                alt={reply.fullName}
-              />
-              {reply.fullName}
-            </p>
-            <p className="text-sm text-gray-600 dark:text-gray-400">
-              <time
-                pubdate
-                datetime={reply.timestamp?.toDate().toISOString()}
-                title={reply.timestamp?.toDate().toLocaleString()}
-              >
-                {reply.timestamp
-                  ? formatDistanceToNow(new Date(reply.timestamp.seconds * 1000), { addSuffix: true })
-                  : 'No timestamp'}
-              </time>
-            </p>
-            
-          </div>
-        </footer>
-        <p className="text-gray-500 dark:text-gray-400">{reply.text}</p>
-        
-      </article>
-    ))}
-  </div>
-)}
-
+                <div className="">
+                  {Object.values(comment.replies).map((reply, index) => (
+                    <article key={index} className="p-6 pb-0 ml-6 lg:ml-12 text-base bg-white rounded-lg dark:bg-gray-900">
+                      <footer className="flex justify-between items-center mb-2">
+                        <div className="flex items-center">
+                          <p className="inline-flex items-center mr-3 text-sm text-gray-900 dark:text-white font-semibold">
+                            <img
+                              className="mr-2 w-6 h-6 rounded-full"
+                              src={reply.avatarUrl}
+                              alt={reply.fullName}
+                            />
+                            {reply.fullName}
+                          </p>
+                          <p className="text-sm text-gray-600 dark:text-gray-400">
+                            <time
+                              pubdate
+                              datetime={reply.timestamp?.toDate().toISOString()}
+                              title={reply.timestamp?.toDate().toLocaleString()}
+                            >
+                              {reply.timestamp
+                                ? formatDistanceToNow(new Date(reply.timestamp.seconds * 1000), { addSuffix: true })
+                                : 'No timestamp'}
+                            </time>
+                          </p>
+                        </div>
+                      </footer>
+                      <p className="text-gray-500 dark:text-gray-400">{reply.text}</p>
+                    </article>
+                  ))}
+                </div>
+              )}
             </article>
           ))}
         </div>

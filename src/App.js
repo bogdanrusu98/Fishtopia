@@ -21,7 +21,7 @@ import PrivateRoute from './components/PrivateRoute';
 import ForgotPassword from './pages/ForgotPassword';
 import { Editor } from '@tinymce/tinymce-react';
 import { UserProvider } from './hooks/userContext';
-
+import User from './pages/User';
 
 function App() {
   const [darkMode, setDarkMode] = useDarkMode(); // Folosește hook-ul pentru a gestiona tema
@@ -54,6 +54,9 @@ function App() {
             <PrivateRoute>
             <Profile />
             </PrivateRoute>} />
+
+            <Route path='/user/:uid' element={<User />} />
+
 
         </Routes>
       </div>

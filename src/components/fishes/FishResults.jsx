@@ -95,22 +95,39 @@ function FishResults({ listing, id }) {
     };
      // onDelete function to remove a listing
      const onDelete = async (listingId) => {
-      if (window.confirm('Are you sure you want to delete this listing?')) {
+      if (window.confirm('Are you sure you want to delete?')) {
         try {
-          // Delete the document from Firestore
-          await deleteDoc(doc(db, 'listings', listingId));
-  
-          // Update the UI to remove the deleted listing
-          setListings(listings.filter((listing) => listing.id !== listingId));
-  
-          // Show success notification
-          toast.success('Listing deleted successfully!');
+          // Pasul 1: Referința la colecția de comentarii
+          const commentsRef = collection(db, 'comments');
+          const q = query(commentsRef, where('listingRef', '==', listingId));
+    
+          // Pasul 2: Obține toate comentariile legate de listingId
+          const querySnap = await getDocs(q);
+          const batch = db.batch(); // Folosim batch pentru a șterge în mod eficient mai multe documente
+    
+          // Pasul 3: Șterge comentariile
+          querySnap.forEach((doc) => {
+            batch.delete(doc.ref);
+          });
+    
+          // Pasul 4: Șterge listing-ul
+          const listingRef = doc(db, 'listings', listingId);
+          batch.delete(listingRef);
+    
+          // Pasul 5: Efectuează operațiunea de ștergere batch
+          await batch.commit();
+    
+          const updatedListings = listings.filter((listing) => listing.id !== listingId);
+          setListings(updatedListings);
+    
+          toast.success('Listing and associated comments deleted successfully!');
         } catch (error) {
-          console.error('Error deleting listing:', error);
-          toast.error('Error deleting listing!');
+          console.error('Error deleting listing and comments: ', error);
+          toast.error('Failed to delete listing and comments');
         }
       }
     };
+    
   const truncateText = (text, maxWords) => {
     const words = text.split(' ');
     if (words.length > maxWords) {
@@ -152,12 +169,17 @@ function FishResults({ listing, id }) {
     {/* Flex pentru a poziționa butonul în dreapta */}
     <div className="flex items-center justify-between mb-4">
       <div className="flex items-center">
+      <Link to={`/user/${listing.userRef}`}>
         <img
           src={userAvatar || "https://flowbite.com/docs/images/people/profile-picture-5.jpg"}
           alt={userName || 'Anonim'}
           className="w-10 h-10 rounded-full mr-3"
         />
+        </Link>
+        <Link to={`/user/${listing.userRef}`}>
+
         <span className="text-gray-700 dark:text-gray-300 font-semibold">{userName || 'Anonim'}</span>
+        </Link>
       </div>
 
       {user && user.uid === listing.userRef ? (
