@@ -173,7 +173,7 @@ function FishResults({ listing, id }) {
         <img
           src={userAvatar || "https://flowbite.com/docs/images/people/profile-picture-5.jpg"}
           alt={userName || 'Anonim'}
-          className="w-10 h-10 rounded-full mr-3"
+          className="w-10 h-10 rounded-full mr-3 object-cover"
         />
         </Link>
         <Link to={`/user/${listing.userRef}`}>

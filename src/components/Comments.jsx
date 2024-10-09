@@ -7,15 +7,35 @@ import { toast } from 'react-toastify';
 import { formatDistanceToNow } from 'date-fns';
 import { FaEdit, FaTrashAlt } from "react-icons/fa";
 import { Dropdown } from "flowbite-react";
+import sendNotification from "../hooks/sendNotification";
 
 function Comments() {
-  const { listingId } = useParams();
+  const { listingId } = useParams(); // Obține ID-ul listingului din URL
   const [comments, setComments] = useState([]);
   const [newCommentText, setNewCommentText] = useState('');
   const [replyText, setReplyText] = useState('');
   const [activeReplyId, setActiveReplyId] = useState(null);
-  const user = useUser();
+  const user = useUser(); // Obține user-ul conectat
+  const [listingOwner, setListingOwner] = useState(null); // Stocăm UID-ul proprietarului listingului
 
+  // Funcție pentru a prelua detaliile listingului
+  const fetchListingOwner = async () => {
+    try {
+      const listingDoc = await getDoc(doc(db, "listings", listingId));
+      if (listingDoc.exists()) {
+        const listingData = listingDoc.data();
+        setListingOwner(listingData.userRef); // Stocăm UID-ul proprietarului listingului
+        console.log(listingOwner)
+
+      } else {
+        console.error("Listing not found");
+      }
+    } catch (error) {
+      console.error("Error fetching listing owner:", error);
+    }
+  };
+
+  // Preluăm comentariile și afișăm în componentă
   const fetchComments = async (listingId) => {
     const q = query(collection(db, "comments"), where("listingRef", "==", listingId));
     const querySnapshot = await getDocs(q);
@@ -29,12 +49,15 @@ function Comments() {
     setComments(commentList);
   };
 
+  // Efect pentru a prelua comentariile și UID-ul proprietarului listingului la montarea componentei
   useEffect(() => {
     if (listingId) {
       fetchComments(listingId);
+      fetchListingOwner(); // Preia UID-ul proprietarului listingului
     }
   }, [listingId]);
 
+  // Funcție pentru a adăuga comentarii
   const handleAddComment = async (e) => {
     e.preventDefault();
     if (!newCommentText.trim()) {
@@ -57,6 +80,15 @@ function Comments() {
       setNewCommentText('');
       fetchComments(listingId);
       toast.success('Comment added successfully');
+
+      // Trimitere notificare către proprietarul listingului
+      if (listingOwner && listingOwner !== user.uid) {
+        await sendNotification({
+          userRef: listingOwner, // UID-ul proprietarului
+          message: `${user.displayName || 'Anonymous'} commented on your listing.`,
+        });
+      }
+
     } catch (error) {
       console.error('Error adding comment:', error);
       toast.error('Failed to add comment');
@@ -68,10 +100,10 @@ function Comments() {
       toast.error('Reply cannot be empty');
       return;
     }
-  
+
     const commentRef = doc(db, "comments", commentId);
     const replyId = new Date().getTime(); // Generăm un ID temporar pentru reply
-  
+
     const replyData = {
       text: replyText,
       userId: user.uid,
@@ -79,18 +111,18 @@ function Comments() {
       avatarUrl: user.photoURL || "https://flowbite.com/docs/images/people/profile-picture-5.jpg",
       timestamp: null, // Temporar punem `null` pentru timestamp
     };
-  
+
     try {
       // Adăugăm reply-ul în array cu timestamp `null`
       await updateDoc(commentRef, {
         [`replies.${replyId}`]: replyData,
       });
-  
+
       // Actualizăm reply-ul să aibă un timestamp corect folosind `serverTimestamp()`
       await updateDoc(commentRef, {
         [`replies.${replyId}.timestamp`]: serverTimestamp(),
       });
-  
+
       setReplyText('');
       setActiveReplyId(null);
       fetchComments(listingId);
@@ -100,17 +132,16 @@ function Comments() {
       toast.error('Failed to add reply');
     }
   };
-  
 
- // onDelete function to remove a listing
- 
- const onDelete = async (commentId) => {
-  if (window.confirm('Are you sure you want to delete?')) {
-    await deleteDoc(doc(db, 'comments', listingId));
-    const updatedComments = comments.filter((comment) => comment.id !== commentId);
-    toast.success('Successfully deleted comment');
-  }
-};
+  // Funcție pentru a șterge un comentariu
+  const onDelete = async (commentId) => {
+    if (window.confirm('Are you sure you want to delete?')) {
+      await deleteDoc(doc(db, 'comments', commentId));
+      const updatedComments = comments.filter((comment) => comment.comId !== commentId);
+      setComments(updatedComments);
+      toast.success('Successfully deleted comment');
+    }
+  };
   return (
     <div>
       <section className="bg-white dark:bg-gray-900 py-4 lg:py-4 antialiased">
@@ -153,7 +184,7 @@ function Comments() {
                   <p className="inline-flex items-center mr-3 text-sm text-gray-900 dark:text-white font-semibold">
                     <Link to={`/user/${comment.userId}`}>
                       <img
-                        className="mr-2 w-6 h-6 rounded-full"
+                        className="mr-2 w-6 h-6 rounded-full object-cover"
                         src={comment.avatarUrl}
                         alt={comment.fullName}
                       />

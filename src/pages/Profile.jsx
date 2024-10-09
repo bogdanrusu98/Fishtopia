@@ -17,7 +17,7 @@ import {
 } from 'firebase/storage';
 import { updateProfile, updateEmail, updatePassword } from "firebase/auth";
 import { initFlowbite } from 'flowbite';
-
+import sendNotification from "../hooks/sendNotification";
 
 const storage = getStorage(); // Inițializează Firebase Storage
 
@@ -179,6 +179,7 @@ function Profile() {
       console.log("Document updated successfully");
   
       toast.success("Profile updated successfully!");
+      await sendNotification(auth.currentUser.uid, 'You have changed your data')
       setIsModalOpen(false); // Închide modalul după actualizare
     } catch (error) {
       console.error("Error updating profile:", error);
@@ -198,7 +199,7 @@ function Profile() {
     <img
       src={user?.photoURL  || "https://flowbite.com/docs/images/people/profile-picture-5.jpg"}
       alt={user?.displayName || 'Anonim'}
-      className="w-40 h-40 rounded-full mr-3"
+      className="w-40 h-40 rounded-full mr-3 object-cover"
     />
 <span className="text-gray-700 dark:text-gray-200 text-5xl font-semibold">
   {user?.displayName || 'Anonim'}
@@ -247,7 +248,8 @@ function Profile() {
           id="email"
           value={email}
           onChange={onChange}
-          className="w-full p-2 mb-4 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+          disabled
+          className="w-full p-2 mb-4 cursor-not-allowed border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
         />
 
         <label htmlFor="password" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
@@ -308,7 +310,7 @@ function Profile() {
     </ul>
 </div>
 <div id="default-tab-content">
-    <div className="hidden p-4 rounded-lg bg-gray-50 dark:bg-gray-800" id="profile" role="tabpanel" aria-labelledby="profile-tab">
+    <div className="hidden rounded-lg bg-gray-50 dark:bg-gray-800" id="profile" role="tabpanel" aria-labelledby="profile-tab">
     <div className="flex flex-wrap gap-4 mt-4">
         
         {loading ? (

@@ -22,6 +22,7 @@ import ForgotPassword from './pages/ForgotPassword';
 import { Editor } from '@tinymce/tinymce-react';
 import { UserProvider } from './hooks/userContext';
 import User from './pages/User';
+import Inbox from './pages/Inbox';
 
 function App() {
   const [darkMode, setDarkMode] = useDarkMode(); // Folosește hook-ul pentru a gestiona tema
@@ -56,6 +57,8 @@ function App() {
             </PrivateRoute>} />
 
             <Route path='/user/:uid' element={<User />} />
+            <Route path='/inbox' element={<Inbox />} />
+
 
 
         </Routes>

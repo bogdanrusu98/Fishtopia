@@ -138,7 +138,7 @@ function User() {
     <img
       src={userData?.avatar  || "https://flowbite.com/docs/images/people/profile-picture-5.jpg"}
       alt={userData?.name || 'Anonim'}
-      className="w-40 h-40 rounded-full mr-3"
+      className="w-40 h-40 rounded-full mr-3 object-cover"
     />
 <span className="text-gray-700 dark:text-gray-200 text-5xl font-semibold">
   {userData?.name || 'Anonim'}
@@ -169,7 +169,7 @@ Add Friend
     </ul>
 </div>
 <div id="default-tab-content">
-    <div className="hidden p-4 rounded-lg bg-gray-50 dark:bg-gray-800" id="profile" role="tabpanel" aria-labelledby="profile-tab">
+    <div className="hidden rounded-lg bg-gray-50 dark:bg-gray-800" id="profile" role="tabpanel" aria-labelledby="profile-tab">
     <div className="flex flex-wrap gap-4 mt-4">
         
         {loading ? (

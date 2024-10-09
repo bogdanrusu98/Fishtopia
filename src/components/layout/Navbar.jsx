@@ -8,12 +8,16 @@ import { Avatar, Dropdown } from "flowbite-react";
 import { useUser } from '../../hooks/userContext';
 import { FaSun, FaMoon } from 'react-icons/fa';
 import { useDarkMode } from '../../hooks/DarkModeToggle';
+import { collection, query, where, getDocs } from 'firebase/firestore';
+import { db } from '../../firebase.config'
+
 
 function Navbar({title}) {
   const [darkMode, setDarkMode] = useDarkMode(); // Preluăm darkMode și funcția de toggle
   const [loggedIn, setLoggedIn] = useState(false);
   const user = useUser()
   const navigate = useNavigate()
+  const [unreadNotifications, setUnreadNotifications] = useState(0);
 
   useEffect(() => {
     const auth = getAuth();
@@ -41,6 +45,28 @@ function Navbar({title}) {
     // Forțează refresh-ul paginii pentru a aplica tema
     window.location.reload();
   };
+
+
+  // Funcția pentru a prelua numărul de notificări necitite
+  const fetchUnreadNotifications = async () => {
+    if (!user) return; // Dacă nu există utilizator conectat, ieși din funcție
+
+    const q = query(
+      collection(db, 'inboxes'),
+      where('userRef', '==', user.uid),
+      where('isRead', '==', false) // Preia doar notificările necitite
+    );
+
+    const querySnapshot = await getDocs(q);
+    setUnreadNotifications(querySnapshot.size); // Setează numărul de notificări necitite
+  };
+
+  // Folosește `useEffect` pentru a apela `fetchUnreadNotifications` la montarea componentului
+  useEffect(() => {
+    if (user) {
+      fetchUnreadNotifications();
+    }
+  }, [user]);
   
   return (
     <nav className='navbar mb-12 shadow-lg bg-neutral text-neutral-content'>
@@ -69,28 +95,45 @@ function Navbar({title}) {
               <Link to='/create-listing' className='btn btn-primary btn-sm rounded-btn'>+</Link>
   
               {user ? (
-                <Dropdown
-                  arrowIcon={false}
-                  inline={true}
-                  label={<Avatar alt="User settings" img={user.photoURL ? user.photoURL : "https://flowbite.com/docs/images/people/profile-picture-5.jpg"} rounded={true} />}
-                >
-                  <Dropdown.Header>
-                    <span className="block text-sm">{user.displayName}</span>
-                    <span className="block truncate text-sm font-medium">{user.email}</span>
-                  </Dropdown.Header>
-                  <Dropdown.Item>
-                    <Link to='/profile'>
-                      Settings
-                    </Link>
-                  </Dropdown.Item>
-                  <Dropdown.Divider />
-                  <Dropdown.Item onClick={handleLogout}>
-                    Sign out
-                  </Dropdown.Item>
-                </Dropdown>
-              ) : (
-                'You are not logged in'
+        <Dropdown
+          arrowIcon={false}
+          inline={true}
+          label={
+            <div className="relative">
+              <Avatar
+                alt="User settings"
+                img={user.photoURL ? user.photoURL : 'https://flowbite.com/docs/images/people/profile-picture-5.jpg'}
+                rounded={true}
+              />
+              {/* Afișează badge-ul doar dacă există notificări necitite */}
+              {unreadNotifications > 0 && (
+                <div className="absolute inline-flex items-center justify-center w-6 h-6 text-xs font-bold text-white bg-red-500 border-2 border-white rounded-full -top-1 -right-2 dark:border-gray-900">
+                  {unreadNotifications}
+                </div>
               )}
+            </div>
+          }
+        >
+          <Dropdown.Header>
+            <span className="block text-sm">{user.displayName}</span>
+            <span className="block truncate text-sm font-medium">{user.email}</span>
+          </Dropdown.Header>
+          <Dropdown.Item>
+            <Link to="/profile">Settings</Link>
+          </Dropdown.Item>
+          <Dropdown.Item>
+            <Link to="/inbox">Inbox</Link>
+          </Dropdown.Item>
+          <Dropdown.Divider />
+          <Dropdown.Item onClick={handleLogout}>Sign out</Dropdown.Item>
+        </Dropdown>
+      ) : (
+        <>
+          <Link to="/login" className="btn btn-secondary btn-sm rounded-btn">Login</Link>
+          &nbsp;
+          <Link to="/register" className="btn btn-primary btn-sm rounded-btn">Sign Up</Link>
+        </>
+      )}
             </>
           ) : (
             <>
