@@ -67,6 +67,7 @@ function CreateListing() {
         const response = await axios.get(
           `https://nominatim.openstreetmap.org/search?format=json&q=${e.target.value}`
         );
+        console.log("Sugestii primite: ", response.data); // Verificăm dacă răspunsul este corect
         setSuggestions(response.data);
       } catch (error) {
         console.error("Eroare la obținerea sugestiilor: ", error);
@@ -75,11 +76,16 @@ function CreateListing() {
       setSuggestions([]);
     }
   };
+  
+  
 
   const handleSuggestionClick = (lat, lon, displayName) => {
     setPosition([parseFloat(lat), parseFloat(lon)]);
-    setAddress(displayName);
-  };
+    setAddress(displayName); // Acest lucru va actualiza câmpul de adresă
+    setMarkerPosition([parseFloat(lat), parseFloat(lon)]); // Actualizează și poziția marker-ului
+    setSuggestions([]); // Ascunde sugestiile după ce selectezi o adresă
+};
+
 
   const handleDragEnd = (e) => {
     const newLatLng = e.target.getLatLng();
@@ -220,9 +226,26 @@ function CreateListing() {
 
               <div className="mb-4">
                 <label htmlFor="address" className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-200">Address</label>
-                <Field name="address" type="text" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-purple-500 focus:border-purple-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white" />
+                <Field name="address" type="text" value={address} onChange={handleAddressChange} className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-purple-500 focus:border-purple-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white" />
                 <ErrorMessage name="address" component="div" className="text-red-500 text-sm" />
               </div>
+              <div className="suggestions-list bg-white text-black border rounded mb-2">
+  {suggestions.length > 0 && (
+    <ul className="suggestions">
+      {suggestions.map((suggestion) => (
+        <li
+          key={suggestion.place_id}
+          onClick={() =>
+            handleSuggestionClick(suggestion.lat, suggestion.lon, suggestion.display_name)
+          }
+          className="cursor-pointer p-2 hover:bg-gray-200"
+        >
+          {suggestion.display_name}
+        </li>
+      ))}
+    </ul>
+  )}
+</div>
 
               <div className="mb-4">
                 <Map position={position} setPosition={setPosition} handleDragEnd={handleDragEnd} />

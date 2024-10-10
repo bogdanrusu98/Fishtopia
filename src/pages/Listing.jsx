@@ -128,8 +128,8 @@ function Listing() {
             {/* Detalii suplimentare */}
             <div className="bg-gray-100 dark:bg-gray-800 p-4 rounded-md">
               <ul className="max-w-md space-y-1 text-base md:text-lg text-zinc-500 dark:text-gray-300">
-                <li>Peste: {listing.name}</li>
-                <li>Inaltime si greutate: {listing.length}, {listing.weight}</li>
+                <li>Fish: {listing.name}</li>
+                <li>Height and weight: {listing.length} cm, {listing.weight} kg</li>
               </ul>
             </div>
 

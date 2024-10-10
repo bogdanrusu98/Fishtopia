@@ -1,90 +1,110 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
+import FishResults from '../components/fishes/FishResults'
 import { db } from '../firebase.config';
-import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
-import { toast } from 'react-toastify';
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { useNavigate, useParams, Link } from "react-router-dom";
-import { getDoc, doc, updateDoc } from "firebase/firestore";
-import { addDoc, collection, serverTimestamp, query, where, getDocs, orderBy, deleteDoc } from 'firebase/firestore';
-import { v4 as uuidv4 } from 'uuid';
-import FishResults from '../components/fishes/FishResults';
-import { initFlowbite } from 'flowbite';
-import { FaRegMessage } from "react-icons/fa6";
+import { getDoc, doc, query, where, getDocs, orderBy, collection, deleteDoc, onSnapshot } from "firebase/firestore";
+import { sendFriendRequest } from "../hooks/sendFriendRequest";
+import { toast } from 'react-toastify';
 import { IoMdPersonAdd } from "react-icons/io";
-
-
+import { initFlowbite } from "flowbite";
+import { IoPersonRemove } from "react-icons/io5";
 
 const fetchUser = async (uid) => {
-    try {
-      const userRef = doc(db, 'users', uid);
-      const userSnap = await getDoc(userRef);
-      
-      if (userSnap.exists()) {
-        console.log("User data exists:", userSnap.data()); // Adaugă acest log
-        return userSnap.data();
-      } else {
-        console.error('No such user found!');
-        return null;
-      }
-    } catch (error) {
-      console.error('Error fetching user:', error);
-      throw error;
+  try {
+    const userRef = doc(db, 'users', uid);
+    const userSnap = await getDoc(userRef);
+    
+    if (userSnap.exists()) {
+      return userSnap.data();
+    } else {
+      console.error('No such user found!');
+      return null;
     }
-  };
-  
-  
+  } catch (error) {
+    console.error('Error fetching user:', error);
+    throw error;
+  }
+};
 
 function User() {
-
   useEffect(() => {
     initFlowbite()
   }, [])
-
   const { uid } = useParams(); // Extrage `uid` din URL
   const [userData, setUserData] = useState(null);
-
+  const [loading, setLoading] = useState(true);
+  const [listings, setListings] = useState([]);
+  const [comments, setComments] = useState([]);
+  const [isPendingRequest, setIsPendingRequest] = useState(false);
+  const [isFriend, setIsFriend] = useState(false); // Pentru a verifica dacă deja sunt prieteni
+  const auth = getAuth();
+  const navigate = useNavigate();
+  
   useEffect(() => {
     const getUserData = async () => {
       if (uid) {
         try {
-          const user = await fetchUser(uid); 
+          const user = await fetchUser(uid);
           setUserData(user);
         } catch (error) {
           console.error('Failed to fetch user data:', error);
         }
       }
     };
-
-    const checkUser = () => {
-        if(auth.currentUser.uid == uid) {
-            navigate('/profile')
-        }
+  
+    const checkFriendStatus = async () => {
+      if (!auth.currentUser?.uid) return;
+  
+      const friendsRef = collection(db, 'friends');
+      const q1 = query(friendsRef, where('user1', '==', auth.currentUser.uid), where('user2', '==', uid));
+      const q2 = query(friendsRef, where('user1', '==', uid), where('user2', '==', auth.currentUser.uid));
+  
+      const querySnap1 = await getDocs(q1);
+      const querySnap2 = await getDocs(q2);
+  
+      // Verificăm dacă există prietenie în ambele direcții
+      if (!querySnap1.empty || !querySnap2.empty) {
+        setIsFriend(true); // Sunt deja prieteni
+      } else {
+        setIsFriend(false); // Nu sunt prieteni
+      }
+    };
+  
+    // Navigăm către profilul propriu dacă utilizatorul încearcă să-l vadă
+    if (auth.currentUser && auth.currentUser.uid === uid) {
+      navigate('/profile');
+    } else {
+      getUserData();
+      checkFriendStatus();
     }
+  }, [uid, auth.currentUser, navigate]);
   
-    getUserData();
-    checkUser()
-  }, [uid]);
-  
-  const [comments, setComments] = useState(null)
-  const [listings, setListings] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const auth = getAuth();
-  const navigate = useNavigate();
-
   useEffect(() => {
-    const fetchUserData = async () => {
-      if (uid) {
-        try {
-          const user = await fetchUser(uid); // Preia datele utilizatorului pe baza `uid`-ului
-          setUserData(user);
-        } catch (error) {
-          console.error('Failed to fetch user data:', error);
+    const checkPendingRequest = async () => {
+      if (!auth.currentUser?.uid || !uid) return;
+  
+      const q = query(
+        collection(db, 'friendRequests'),
+        where('senderId', '==', auth.currentUser.uid),
+        where('receiverId', '==', uid),
+        where('status', '==', 'pending')
+      );
+  
+      const unsubscribe = onSnapshot(q, (snapshot) => {
+        if (!snapshot.empty) {
+          setIsPendingRequest(true); // Există o cerere pending
+        } else {
+          setIsPendingRequest(false); // Nu există cereri pending
         }
-      }
+      });
+  
+      return () => unsubscribe(); // Dezabonare de la evenimentul în timp real
     };
-
-    fetchUserData();
-  }, [uid]);
-
+  
+    checkPendingRequest();
+  }, [auth.currentUser?.uid, uid]);
+  
   useEffect(() => {
     const fetchUserListings = async () => {
       const listingsRef = collection(db, 'listings');
@@ -93,7 +113,7 @@ function User() {
 
       let listings = [];
       querySnap.forEach((doc) => {
-        return listings.push({
+        listings.push({
           id: doc.id,
           data: doc.data(),
         });
@@ -105,7 +125,6 @@ function User() {
     fetchUserListings();
   }, [uid]);
 
-  // Fetch comments left by the user
   useEffect(() => {
     const fetchUserComments = async () => {
       const commentsRef = collection(db, 'comments');
@@ -129,6 +148,52 @@ function User() {
     }
   }, [uid]);
 
+  // Funcția pentru trimiterea unei cereri de prietenie
+  const handleAddFriend = async () => {
+    try {
+      if (!auth.currentUser) {
+        toast.error('Trebuie să fii conectat pentru a trimite cereri de prietenie');
+        return;
+      }
+
+      await sendFriendRequest(auth.currentUser.uid, uid, auth.currentUser.displayName);
+      toast.success('Cerere de prietenie trimisă');
+    } catch (error) {
+      toast.error('Eroare la trimiterea cererii de prietenie');
+      console.error('Eroare la trimiterea cererii de prietenie:', error);
+    }
+  };
+
+  const handleRemoveFriend = async (friendId) => {
+    try {
+      // Referința la colecția 'friends'
+      const friendsRef = collection(db, 'friends');
+  
+      // Căutăm documentele care reprezintă relația de prietenie dintre utilizatorul curent și prieten
+      const q1 = query(friendsRef, where('user1', '==', auth.currentUser.uid), where('user2', '==', friendId));
+      const q2 = query(friendsRef, where('user1', '==', friendId), where('user2', '==', auth.currentUser.uid));
+  
+      // Obținem documentele pentru ambele direcții ale prieteniei
+      const querySnap1 = await getDocs(q1);
+      const querySnap2 = await getDocs(q2);
+  
+      // Ștergem documentele care reprezintă relația de prietenie
+      const batchDelete = async (querySnap) => {
+        querySnap.forEach(async (docSnap) => {
+          await deleteDoc(doc(db, 'friends', docSnap.id));
+        });
+      };
+  
+      await batchDelete(querySnap1);
+      await batchDelete(querySnap2);
+  
+      toast.success('Friend removed successfully.');
+    } catch (error) {
+      console.error('Error removing friend:', error);
+      toast.error('Error removing friend.');
+    }
+  };
+
   return (
     <div>
 
@@ -144,14 +209,33 @@ function User() {
   {userData?.name || 'Anonim'}
 </span>
   </div>
-
-<button
-className="mt-4 sm:mt-0 flex items-center bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-md"
-onClick={() => alert('In Progress')} // Deschide modalul
->
-<IoMdPersonAdd className="mr-2" />
-Add Friend
-</button>
+  {!isFriend && auth.currentUser?.uid !== uid ? (
+        isPendingRequest ? (
+          <button
+            className="mt-4 sm:mt-0 flex items-center bg-gray-400 text-white font-semibold py-2 px-4 rounded-md cursor-not-allowed"
+            disabled
+          >
+            <IoMdPersonAdd className="mr-2" />
+            Request Pending
+          </button>
+        ) : (
+          <button
+            className="mt-4 sm:mt-0 flex items-center bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-md"
+            onClick={handleAddFriend}
+          >
+            <IoMdPersonAdd className="mr-2" />
+            Add Friend
+          </button>
+        )
+      ) : (
+        <button
+          className="mt-4 sm:mt-0 flex items-center bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded-md"
+          onClick={() => handleRemoveFriend(uid)}  
+        >
+          <IoPersonRemove className="mr-2" />
+          Remove Friend
+        </button>
+      )}
 
 
 
@@ -169,7 +253,7 @@ Add Friend
     </ul>
 </div>
 <div id="default-tab-content">
-    <div className="hidden rounded-lg bg-gray-50 dark:bg-gray-800" id="profile" role="tabpanel" aria-labelledby="profile-tab">
+    <div className="hidden p-4 pt-1 rounded-lg bg-gray-50 dark:bg-gray-800" id="profile" role="tabpanel" aria-labelledby="profile-tab">
     <div className="flex flex-wrap gap-4 mt-4">
         
         {loading ? (
