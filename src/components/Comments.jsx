@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { collection, getDocs, addDoc, query, where, updateDoc, doc, arrayUnion, serverTimestamp, getDoc, deleteDoc } from 'firebase/firestore';
+import { collection, getDocs, addDoc, query, where, updateDoc, doc, arrayUnion, serverTimestamp, getDoc, deleteDoc, orderBy } from 'firebase/firestore';
 import { db } from '../firebase.config';
 import { useUser } from '../hooks/userContext';
 import { useParams, Link } from 'react-router-dom';
@@ -37,7 +37,7 @@ function Comments() {
 
   // Preluăm comentariile și afișăm în componentă
   const fetchComments = async (listingId) => {
-    const q = query(collection(db, "comments"), where("listingRef", "==", listingId));
+    const q = query(collection(db, "comments"), where("listingRef", "==", listingId), orderBy('timestamp', 'desc'));
     const querySnapshot = await getDocs(q);
     const commentList = querySnapshot.docs.map((doc) => ({
       ...doc.data(),
@@ -86,6 +86,7 @@ function Comments() {
         await sendNotification({
           userRef: listingOwner, // UID-ul proprietarului
           message: `${user.displayName || 'Anonymous'} commented on your listing.`,
+          href: `/listing/${listingId}`
         });
       }
 
@@ -127,6 +128,11 @@ function Comments() {
       setActiveReplyId(null);
       fetchComments(listingId);
       toast.success('Reply added successfully');
+      await sendNotification({
+        userRef: listingOwner, // UID-ul proprietarului
+        message: `${user.displayName || 'Anonymous'} reply to your comment.`,
+        href: `/listing/${listingId}`
+      });
     } catch (error) {
       console.error('Error adding reply:', error);
       toast.error('Failed to add reply');
@@ -142,6 +148,26 @@ function Comments() {
       toast.success('Successfully deleted comment');
     }
   };
+
+  const onDeleteReply = async (commentId, reply) => {
+    if (window.confirm('Are you sure you want to delete this reply?')) {
+      try {
+        const commentRef = doc(db, 'comments', commentId);
+  
+        // Ștergem reply-ul din comentariu
+        await updateDoc(commentRef, {
+          [`replies.${reply.timestamp.seconds}`]: deleteDoc(), // Șterge reply-ul pe baza timestamp-ului
+        });
+  
+        toast.success('Reply deleted successfully');
+        fetchComments(listingId); // Reîncarcă comentariile
+      } catch (error) {
+        console.error('Error deleting reply:', error);
+        toast.error('Failed to delete reply');
+      }
+    }
+  };
+  
   return (
     <div>
       <section className="bg-white dark:bg-gray-900 py-4 lg:py-4 antialiased">
@@ -274,37 +300,59 @@ function Comments() {
   
               {/* Afișăm și reply-urile */}
               {comment.replies && Object.values(comment.replies).length > 0 && (
-                <div className="">
-                  {Object.values(comment.replies).map((reply, index) => (
-                    <article key={index} className="p-6 pb-0 ml-6 lg:ml-12 text-base bg-white rounded-lg dark:bg-gray-900">
-                      <footer className="flex justify-between items-center mb-2">
-                        <div className="flex items-center">
-                          <p className="inline-flex items-center mr-3 text-sm text-gray-900 dark:text-white font-semibold">
-                            <img
-                              className="mr-2 w-6 h-6 rounded-full"
-                              src={reply.avatarUrl}
-                              alt={reply.fullName}
-                            />
-                            {reply.fullName}
-                          </p>
-                          <p className="text-sm text-gray-600 dark:text-gray-400">
-                            <time
-                              pubdate
-                              datetime={reply.timestamp?.toDate().toISOString()}
-                              title={reply.timestamp?.toDate().toLocaleString()}
-                            >
-                              {reply.timestamp
-                                ? formatDistanceToNow(new Date(reply.timestamp.seconds * 1000), { addSuffix: true })
-                                : 'No timestamp'}
-                            </time>
-                          </p>
-                        </div>
-                      </footer>
-                      <p className="text-gray-500 dark:text-gray-400">{reply.text}</p>
-                    </article>
-                  ))}
-                </div>
-              )}
+  <div className="">
+    {/* Sortăm reply-urile în funcție de timestamp descrescător */}
+    {Object.values(comment.replies)
+      .sort((a, b) => a.timestamp?.seconds - b.timestamp?.seconds) // Sortare descrescătoare
+      .map((reply, index) => (
+        <article key={index} className="p-6 pb-0 ml-6 lg:ml-12 text-base bg-white rounded-lg dark:bg-gray-900">
+          <footer className="flex justify-between items-center mb-2">
+            <div className="flex items-center">
+              <p className="inline-flex items-center mr-3 text-sm text-gray-900 dark:text-white font-semibold">
+                <img
+                  className="mr-2 w-6 h-6 rounded-full"
+                  src={reply.avatarUrl}
+                  alt={reply.fullName}
+                />
+                {reply.fullName}
+              </p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                <time
+                  pubdate
+                  datetime={reply.timestamp?.toDate().toISOString()}
+                  title={reply.timestamp?.toDate().toLocaleString()}
+                >
+                  {reply.timestamp
+                    ? formatDistanceToNow(new Date(reply.timestamp.seconds * 1000), { addSuffix: true })
+                    : 'No timestamp'}
+                </time>
+              </p>
+            </div>
+
+            {/* Dropdown pentru ștergerea reply-urilor */}
+            {user && user.uid === reply.userId ? (
+              <Dropdown
+                arrowIcon={false}
+                inline={true}
+                label={
+                  <svg className="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 4 15">
+                    <path d="M3.5 1.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Zm0 6.041a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Zm0 5.959a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Z" />
+                  </svg>
+                }
+              >
+                <Dropdown.Item onClick={() => onDeleteReply(comment.comId, reply)}>
+                  <FaTrashAlt className="mr-2" />
+                  Delete
+                </Dropdown.Item>
+              </Dropdown>
+            ) : null}
+          </footer>
+          <p className="text-gray-500 dark:text-gray-400">{reply.text}</p>
+        </article>
+      ))}
+  </div>
+)}
+
             </article>
           ))}
         </div>

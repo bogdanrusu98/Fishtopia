@@ -2,7 +2,7 @@ import { db } from '../firebase.config';
 import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
 
 // Funcția pentru a trimite o notificare
-export const sendNotification = async ({ userRef, message, type, requestId, senderId }) => {
+export const sendNotification = async ({ userRef, message, type, requestId, senderId, href }) => {
   try {
     // Creăm un obiect pentru notificare
     const notification = {
@@ -12,7 +12,7 @@ export const sendNotification = async ({ userRef, message, type, requestId, send
       timestamp: serverTimestamp(), // Timestamp-ul când a fost trimisă notificarea
     };
 
-    // Adăugăm 'type', 'requestId' și 'senderId' doar dacă sunt definite
+    // Adăugăm 'type', 'requestId', 'senderId', și 'href' doar dacă sunt definite
     if (type) {
       notification.type = type;
     }
@@ -23,6 +23,10 @@ export const sendNotification = async ({ userRef, message, type, requestId, send
 
     if (senderId) {
       notification.senderId = senderId; // Asigură-te că senderId este adăugat
+    }
+
+    if (href) {
+      notification.href = href; // Adăugăm href dacă este furnizat
     }
 
     // Adăugăm notificarea în colecția 'inboxes'

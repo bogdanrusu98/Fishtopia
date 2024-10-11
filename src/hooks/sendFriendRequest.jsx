@@ -17,7 +17,8 @@ export const sendFriendRequest = async (senderId, receiverId, senderName) => {
       message: `${senderName} has sent you a friend request.`,
       type: 'friend_request',
       requestId: friendRequestRef.id, 
-      senderId: senderId
+      senderId: senderId,
+      href: `/user/${senderId}`
     });
 
     console.log('Friend request sent and notification added.');

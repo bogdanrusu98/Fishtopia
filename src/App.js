@@ -23,6 +23,7 @@ import { Editor } from '@tinymce/tinymce-react';
 import { UserProvider } from './hooks/userContext';
 import User from './pages/User';
 import Inbox from './pages/Inbox';
+import Search from './pages/Search';
 
 function App() {
   const [darkMode, setDarkMode] = useDarkMode(); // Folosește hook-ul pentru a gestiona tema
@@ -58,6 +59,8 @@ function App() {
 
             <Route path='/user/:uid' element={<User />} />
             <Route path='/inbox' element={<Inbox />} />
+            <Route path='/search' element={<Search />} />
+
 
 
 
