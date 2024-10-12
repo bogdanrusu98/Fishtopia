@@ -110,7 +110,7 @@ function Navbar({ title }) {
 <div className='hidden md:block '>
 <InstantSearch searchClient={searchClient} indexName="listings">
       <div className="search-bar-container">
-        <SearchBox className="search-box ml-4" onFocus={() => setShowHits(true)} />
+        <SearchBox placeholder='Search by names, listings' className="search-box ml-4" onFocus={() => setShowHits(true)} />
         {showHits && (
           <div className="search-results">
             <Index indexName="listings">
