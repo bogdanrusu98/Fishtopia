@@ -1,5 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
+import { useRef } from 'react';
 import { IoFishSharp } from "react-icons/io5";
 import { getAuth, onAuthStateChanged, signOut } from 'firebase/auth';
 import { useState, useEffect } from 'react';
@@ -10,7 +11,11 @@ import { FaSun, FaMoon } from 'react-icons/fa';
 import { useDarkMode } from '../../hooks/DarkModeToggle';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '../../firebase.config';
-
+import  algoliasearch  from "algoliasearch/lite";
+import "instantsearch.css/themes/satellite.css";
+import { Hits, InstantSearch, SearchBox, Configure } from "react-instantsearch";
+import { Hit } from "./Hit";
+import {useOutsideClick} from '../../hooks/useOutsideClick'
 function Navbar({ title }) {
 
   const [darkMode, setDarkMode] = useDarkMode();
@@ -18,8 +23,15 @@ function Navbar({ title }) {
   const user = useUser();
   const navigate = useNavigate();
   const [unreadNotifications, setUnreadNotifications] = useState(0);
+  const [searchDropdownOpen, setSearchDropdownOpen] = useState(false);
+  const ref = useRef(null); // Ref for the component that contains the hits and search box
+  const [showHits, setShowHits] = useState(false);
+
   const [searchQuery, setSearchQuery] = useState('');
-  const [searchDropdownOpen, setSearchDropdownOpen] = useState(false); // Toggle for dropdown on mobile
+  const algoliaAppId = process.env.REACT_APP_ALGOLIA_APP_ID;
+  const algoliaApiKey = process.env.REACT_APP_ALGOLIA_ADMIN_KEY;
+
+  const searchClient = algoliasearch(algoliaAppId, algoliaApiKey)
 
   useEffect(() => {
     const auth = getAuth();
@@ -33,6 +45,11 @@ function Navbar({ title }) {
 
     return () => unsubscribe();
   }, []);
+
+
+  useOutsideClick(ref, () => {
+    if (showHits) setShowHits(false);
+  });
 
   const handleLogout = async () => {
     const auth = getAuth();
@@ -82,30 +99,27 @@ function Navbar({ title }) {
 
   return (
     <nav className='navbar mb-12 shadow-lg bg-neutral text-neutral-content'>
-      <div className='container mx-auto'>
+      <div className='container mx-auto'  ref={ref}>
         <div className='flex-none px-2 mx-2 flex items-center'>
           <IoFishSharp className='inline pr-2 text-3xl' />
           <Link to='/' className='text-lg font-bold align-middle'>
             {title}
           </Link>
 
-            {/* Search Bar */}
-            <div className="relative hidden md:block ml-4">
-              <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                <svg className="w-4 h-4 text-gray-500 dark:text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
-                  <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
-                </svg>
-              </div>
-              <input
-                type="text"
-                className="block w-full p-2 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
-                placeholder="Search..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                onKeyDown={handleKeyDown} // Adaugă evenimentul pentru Enter
+<div className='hidden md:block '>
+          <InstantSearch searchClient={searchClient} indexName="content">
+            <div className="search-bar-container">
+              <SearchBox className="search-box ml-4"
+                onFocus={() => setShowHits(true)}
               />
+              {showHits && (
+                <div className="search-results">
+                  <Hits hitComponent={Hit} />
+                </div>
+              )}
             </div>
-          
+          </InstantSearch>
+          </div>
         </div>
 
         <div className='flex-1 px-2 mx-2'>
@@ -118,30 +132,27 @@ function Navbar({ title }) {
               onClick={() => setSearchDropdownOpen(!searchDropdownOpen)}
             >
               <svg className="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
-                <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
+                <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8 a7 7 0 0 1 14 0Z"/>
               </svg>
               <span className="sr-only">Search</span>
             </button>
 
             {searchDropdownOpen && (
-  <div className="absolute top-14 right-4 w-full max-w-sm md:hidden bg-gray-800 dark:bg-gray-900 rounded-lg p-4 shadow-lg">
-    <form onSubmit={handleSearch}>
-      <input
-        type="text"
-        className="block w-full p-2 ps-10 text-sm text-white border border-gray-300 rounded-lg bg-gray-700 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
-        placeholder="Search..."
-        value={searchQuery}
-        onChange={(e) => setSearchQuery(e.target.value)}
-      />
-      <button
-        type="submit"
-        className="mt-2 bg-blue-600 text-white py-2 px-4 rounded-lg w-full dark:bg-blue-700 dark:hover:bg-blue-800"
-      >
-        Search
-      </button>
-    </form>
-  </div>
-)}
+              <div className="absolute top-14 right-4 w-full max-w-sm md:hidden bg-gray-800 dark:bg-gray-900 rounded-lg p-4 shadow-lg">
+               <InstantSearch searchClient={searchClient} indexName="content">
+            <div className="search-bar-container">
+              <SearchBox className="search-box ml-4 rounded"
+                onFocus={() => setShowHits(true)}
+              />
+              {showHits && (
+                <div className="search-results">
+                  <Hits hitComponent={Hit} />
+                </div>
+              )}
+            </div>
+          </InstantSearch>
+              </div>
+            )}
 
 
             {loggedIn ? (

@@ -40,3 +40,39 @@
         span {
           color: black
         }
+        .search-bar-container {
+          position: relative;
+        }
+        
+        .search-results {
+          position: absolute;
+          top: 100%; 
+          left: 0;
+          width: 100%;
+          background: white;
+          box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+          max-height: 300px;
+          overflow-y: auto;
+          z-index: 1000;
+        }
+        
+        .hit-title, .hit-description, .hit-name {
+          font-size: 0.75rem; 
+        }
+        article.dark {
+          background-color: #333;
+          color: #fff;
+        }
+        article .hit-title mark,
+        article .hit-description mark,
+        article .hit-name mark {
+          background-color: yellow;
+        }
+        article.dark .hit-title mark,
+        article.dark .hit-description mark,
+        article.dark .hit-name mark {
+          background-color: orange;
+        }
+        .ais-SearchBox-form {
+          border-radius: 50px
+        }
