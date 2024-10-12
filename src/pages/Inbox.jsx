@@ -198,22 +198,22 @@ const acceptFriendRequest = async (notif) => {
   notifications.map((notif) => (
     <tr
       key={notif.id}
-      className={`bg-white border-b dark:bg-gray-800 dark:border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 ${
-        notif.isRead ? 'text-gray-300' : 'text-gray-400'
+      className={`bg-white border-b dark:bg-gray-800  dark:border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 ${
+        notif.isRead ? 'dark:text-gray-300 text-gray-500' : 'dark:text-gray-400 text-gray-600'
       }`}
     >
-      <td className="px-6 py-4">
+      <td className="px-6 py-4 text-gray-300">
         {/* Verificăm dacă există un href pentru a face notificarea un link */}
         {notif.href ? (
           <Link
             to={notif.href}
-            className="font-medium  hover:underline"
+            className="font-medium  hover:underline text-gray-600 dark:text-gray-300"
             rel="noopener noreferrer"
           >
             {notif.message}
           </Link>
         ) : (
-          <span className='text-gray-300'>{notif.message}</span>
+          <span className='dark:text-gray-300 text-gray-600'>{notif.message}</span>
         )}
       </td>
       <td className="px-6 py-4">
