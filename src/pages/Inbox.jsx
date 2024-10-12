@@ -154,8 +154,9 @@ const acceptFriendRequest = async (notif) => {
       setNotifications((prevNotifications) =>
         prevNotifications.map((notif) =>
           notif.id === id ? { ...notif, isRead: true } : notif
-        )
-      );
+    )
+  );
+  navigate(0)
     } catch (error) {
       console.error('Error updating notification status:', error);
     }
