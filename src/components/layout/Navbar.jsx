@@ -13,8 +13,9 @@ import { collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '../../firebase.config';
 import  algoliasearch  from "algoliasearch/lite";
 import "instantsearch.css/themes/satellite.css";
-import { Hits, InstantSearch, SearchBox, Configure } from "react-instantsearch";
+import { Hits, InstantSearch, SearchBox, Configure, Index } from "react-instantsearch";
 import { Hit } from "./Hit";
+import { UserHit } from '../UserHit';
 import {useOutsideClick} from '../../hooks/useOutsideClick'
 function Navbar({ title }) {
 
@@ -107,18 +108,21 @@ function Navbar({ title }) {
           </Link>
 
 <div className='hidden md:block '>
-          <InstantSearch searchClient={searchClient} indexName="content">
-            <div className="search-bar-container">
-              <SearchBox className="search-box ml-4"
-                onFocus={() => setShowHits(true)}
-              />
-              {showHits && (
-                <div className="search-results">
-                  <Hits hitComponent={Hit} />
-                </div>
-              )}
-            </div>
-          </InstantSearch>
+<InstantSearch searchClient={searchClient} indexName="listings">
+      <div className="search-bar-container">
+        <SearchBox className="search-box ml-4" onFocus={() => setShowHits(true)} />
+        {showHits && (
+          <div className="search-results">
+            <Index indexName="listings">
+              <Hits hitComponent={Hit} />
+            <Index indexName="users">
+              <Hits hitComponent={UserHit} />
+            </Index>
+            </Index>
+          </div>
+        )}
+      </div>
+    </InstantSearch>
           </div>
         </div>
 
@@ -139,18 +143,21 @@ function Navbar({ title }) {
 
             {searchDropdownOpen && (
               <div className="absolute top-14 right-4 w-full max-w-sm md:hidden bg-gray-800 dark:bg-gray-900 rounded-lg p-4 shadow-lg">
-               <InstantSearch searchClient={searchClient} indexName="content">
-            <div className="search-bar-container">
-              <SearchBox className="search-box ml-4 rounded"
-                onFocus={() => setShowHits(true)}
-              />
-              {showHits && (
-                <div className="search-results">
-                  <Hits hitComponent={Hit} />
-                </div>
-              )}
-            </div>
-          </InstantSearch>
+              <InstantSearch searchClient={searchClient} indexName="listings">
+      <div className="search-bar-container">
+        <SearchBox className="search-box ml-4" onFocus={() => setShowHits(true)} />
+        {showHits && (
+          <div className="search-results">
+            <Index indexName="listings">
+              <Hits hitComponent={Hit} />
+            <Index indexName="users">
+              <Hits hitComponent={UserHit} />
+            </Index>
+            </Index>
+          </div>
+        )}
+      </div>
+    </InstantSearch>
               </div>
             )}
 
