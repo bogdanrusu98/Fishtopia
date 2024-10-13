@@ -13,6 +13,7 @@ import Map from "../components/Map";
 import { db } from "../firebase.config";
 import { getDoc, doc } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
+import { formatDistanceToNow } from 'date-fns';
 
 SwiperCore.use([Navigation, Pagination, Zoom]);
 
@@ -24,6 +25,7 @@ function Listing() {
   const navigate = useNavigate();
   const auth = getAuth();
   const params = useParams();
+  const [timePosted, setTimePosted] = useState('');
 
   useEffect(() => {
     const fetchListing = async () => {
@@ -31,7 +33,11 @@ function Listing() {
       const docSnap = await getDoc(docRef);
 
       if (docSnap.exists()) {
-        setListing(docSnap.data()); // Setăm listing după ce îl obținem din Firestore
+        const data = docSnap.data();
+        setListing(data);
+        // Presupunem că `createdAt` este un Timestamp Firebase
+        const date = data.timestamp.toDate(); // Convertim Timestamp-ul într-o dată JavaScript
+        setTimePosted(formatDistanceToNow(date, { addSuffix: true }));
       } else {
         console.log("Listing not found");
       }
@@ -93,8 +99,8 @@ function Listing() {
 
                 <p className="font-semibold">{userName || 'Anonim'}</p>
                 </Link>
-                <p className="text-sm text-gray-500 dark:text-gray-400">Posted by {userName || 'Anonim'}</p>
-              </div>
+                <p className="text-sm text-gray-500 dark:text-gray-400">{timePosted}</p>
+                </div>
             </div>
 
             {/* Titlul postării */}
