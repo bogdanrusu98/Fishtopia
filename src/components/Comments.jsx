@@ -128,11 +128,13 @@ function Comments() {
       setActiveReplyId(null);
       fetchComments(listingId);
       toast.success('Reply added successfully');
-      await sendNotification({
-        userRef: listingOwner, // UID-ul proprietarului
-        message: `${user.displayName || 'Anonymous'} reply to your comment.`,
-        href: `/listing/${listingId}`
-      });
+      if(listingOwner != user.uid) {
+        await sendNotification({
+          userRef: listingOwner, // UID-ul proprietarului
+          message: `${user.displayName || 'Anonymous'} replied to your comment.`,
+          href: `/listing/${listingId}`
+        });
+    }
     } catch (error) {
       console.error('Error adding reply:', error);
       toast.error('Failed to add reply');
